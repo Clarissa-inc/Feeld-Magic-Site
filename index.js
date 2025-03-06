@@ -15,6 +15,9 @@ app.set("views", "./web/frontend")
 app.set("view engine", "ejs")
 app.use(bodyParser.json())
 
+// Version Helper
+var releaseVersion = "1.0.1"
+
 async function ensureAccessTokenIsValid() {
     var account = JSON.parse(fs.readFileSync("./data/account.json"))
 
@@ -171,9 +174,23 @@ app.get("/", async function(request, response) {
     }
 })
 
-createServer(app).listen(7331, () => {
+createServer(app).listen(7331, async () => {
     if (fs.readFileSync("./data/apiKey.txt").toString().trim().length === 0) {
         console.log("[-] apiKey hasn't been set, contact developer for a key")
+
+        return process.exit(0)
+    }
+
+    var latestVersion = await util.getLatestVersion()
+
+    if (latestVersion === false) {
+        console.log(`[-] Backend is down, exiting...`)
+        
+        return process.exit(0)
+    }
+
+    if (latestVersion !== latestVersion) {
+        console.log(`[-] You aren't using the latest version, please update to the latest version - https://github.com/feeldghost/Feeld-Magic-Site`)
 
         return process.exit(0)
     }
