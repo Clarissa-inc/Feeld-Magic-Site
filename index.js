@@ -16,7 +16,8 @@ app.set("view engine", "ejs")
 app.use(bodyParser.json())
 
 // Version Helper
-var releaseVersion = "1.0.1"
+var releaseVersion = "1.0.2"
+var feeldVersion = "7.22.0"
 
 async function ensureAccessTokenIsValid() {
     var account = JSON.parse(fs.readFileSync("./data/account.json"))
@@ -42,12 +43,18 @@ app.post("/feeldRequest", async function(request, response) {
         if (!operationName)
             return response.status(500).json({});
 
+        if (operationName == "Logout") {
+            fs.writeFileSync("./data/account.json", JSON.stringify({ "profileId": null, "accessToken": null, "refreshToken": null }, null, "\t"));
+
+            return response.status(200).json({ success: true })
+        }
+
         var headers = null
 
         if (operationName === "SignInLink")
             headers = util.generateFeeldHeaders(false, "null")
 
-        if (operationName === "ProfileLike" || operationName == "ProfileDislike") {
+        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "WhoLikesMe") {
             await ensureAccessTokenIsValid()
 
             var account = JSON.parse(fs.readFileSync("./data/account.json"))
@@ -150,23 +157,7 @@ app.get("/", async function(request, response) {
             }
         }
 
-        var likesResponse = await util.feeldRequest(util.generateFeeldHeaders(account["accessToken"], account["profileId"]), {
-            operationName: "WhoLikesMe",
-            query: "query WhoLikesMe($limit: Int, $cursor: String, $sortBy: SortBy!) {\n  interactions: whoLikesMe(\n    input: {sortBy: $sortBy}\n    limit: $limit\n    cursor: $cursor\n  ) {\n    nodes {\n      ...LikesProfileFragment\n      __typename\n    }\n    pageInfo {\n      total\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment LikesProfileFragment on Profile {\n  id\n  age\n  gender\n  status\n  lastSeen\n  isUplift\n  sexuality\n  isMajestic\n  dateOfBirth\n  streamUserId\n  imaginaryName\n  allowPWM\n  verificationStatus\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  profilePairs {\n    identityId\n    __typename\n  }\n  distance {\n    km\n    mi\n    __typename\n  }\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  photos {\n    ...PhotoCarouselPictureFragment\n    __typename\n  }\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment PhotoCarouselPictureFragment on Picture {\n  id\n  pictureIsPrivate\n  pictureIsSafe\n  pictureStatus\n  pictureType\n  pictureUrl\n  publicId\n  verification {\n    status\n    __typename\n  }\n  __typename\n}",
-            variables: { sortBy: "LAST_INTERACTION" }
-        })
-
-        if (!likesResponse) {
-            console.log("[-] Failed to get likes, odd")
-            return response.status(500).json({ error: "Failed to get likes, odd" })
-        }
-
-        if (likesResponse.data.data && likesResponse.data.data.interactions) {
-            return response.render("index", { "likesResponse": likesResponse.data })
-        } else {
-            console.log("[-] Failed to get likes, odd")
-            return response.status(500).json({ error: "Failed to get likes, odd" })
-        }
+        return response.render("index", { "siteVersion": releaseVersion, "feeldVersion": feeldVersion })
     } catch (error) {
         console.log("Error -", error)
 
@@ -185,7 +176,7 @@ createServer(app).listen(7331, async () => {
 
     if (latestVersion === false) {
         console.log(`[-] Backend is down, exiting...`)
-        
+
         return process.exit(0)
     }
 

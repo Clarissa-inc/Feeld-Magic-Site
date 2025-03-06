@@ -28,12 +28,38 @@
 <body>
     <div id="notification-container" class="notification-container"></div>
 
-    <div id="likesContainer" class="tab-container">
-        <div class="tab">
-            <div style="text-align: center;">
-                <label id="totalLikes" for="totalLikes">? Total Likes (Awaiting data)</label>
+    <div class="main-container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">Feeld</h1>
+                <p class="app-subtitle">v<%- siteVersion %> (v<%- feeldVersion %>)</p>
             </div>
-        <div id="likesUserGrid" class="likes-user-grid"></div>
+            <div class="header-actions">
+                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+        </header>
+
+        <div class="content-layout">
+            <aside class="sidebar">
+                <nav class="navigation-menu">
+                    <a href="#likes" class="nav-link">
+                        <i class="fa-solid fa-thumbs-up"></i> Likes
+                    </a>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+                <section id="likes" class="content-section hidden">
+                    <div id="likesContainer" class="tab-container">
+                        <div class="tab">
+                            <div style="text-align: center;">
+                                <label id="totalLikes" for="totalLikes">? Total Likes (Awaiting data)</label>
+                            </div>
+                        <div id="likesUserGrid" class="likes-user-grid"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -41,10 +67,6 @@
     <script type="text/javascript" src="/vendor/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript" src="/js/likes.js"></script>
-
-    <script>
-        const likesResponse = <%- JSON.stringify(likesResponse) %>;
-    </script>
 </body>
 
 </html>

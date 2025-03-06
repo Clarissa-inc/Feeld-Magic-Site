@@ -1,9 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-    loadLikes(likesResponse)
-
-    notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
-});
-
 function capitalizeFirstLetterWithSpaces(str) {
     return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 }
@@ -11,6 +5,8 @@ function capitalizeFirstLetterWithSpaces(str) {
 function loadLikes(data) {
     var likedBy = data["data"]["interactions"]["nodes"];
     var userGrid = document.getElementById("likesUserGrid");
+
+    notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
     var totalLikes = document.getElementById("totalLikes")
 
