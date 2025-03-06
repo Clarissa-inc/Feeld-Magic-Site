@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Feeld</title>
+
+    <meta name="title" content="Feeld" />
+    <meta name="description" content="Feeld but on web" />
+    <meta name="image" content="https://feeld.co/favicons/favicon.png" />
+
+    <meta property="og:title" content="Feeld" />
+    <meta property="og:description" content="Feeld but on web" />
+    <meta property="og:image" content="https://feeld.co/favicons/favicon.png" />
+
+    <link rel="icon" type="image/x-icon" href="https://feeld.co/favicons/favicon.ico">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/css/main.css" />
+      
+    <link rel="shortcut icon" type="image/x-icon" href="https://feeld.co/favicons/favicon.ico">
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+
+    <div id="likesContainer" class="tab-container">
+        <div class="tab">
+            <div style="text-align: center;">
+                <label id="totalLikes" for="totalLikes">? Total Likes (Awaiting data)</label>
+            </div>
+        <div id="likesUserGrid" class="likes-user-grid"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <script type="text/javascript" src="/vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <script type="text/javascript" src="/js/likes.js"></script>
+
+    <script>
+        const likesResponse = <%- JSON.stringify(likesResponse) %>;
+    </script>
+</body>
+
+</html>

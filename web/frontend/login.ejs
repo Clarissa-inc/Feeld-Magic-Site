@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <meta name="title" content="Feeld" />
+      <meta name="description" content="Feeld but on web" />
+      <meta name="image" content="https://feeld.co/favicons/favicon.png" />
+
+      <meta property="og:title" content="Feeld" />
+      <meta property="og:description" content="Feeld but on web" />
+      <meta property="og:image" content="https://feeld.co/favicons/favicon.png" />
+
+      <link rel="icon" type="image/x-icon" href="https://feeld.co/favicons/favicon.ico">
+
+      <title>Feeld</title>
+
+      <link rel="stylesheet" href="/css/main.css">
+      <link rel="stylesheet" href="/css/auth.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+      
+      <link rel="shortcut icon" type="image/x-icon" href="https://feeld.co/favicons/favicon.ico">
+   </head>
+
+   <body>
+      <div id="notification-container" class="notification-container"></div>
+      
+      <div class="container">
+         <div class="auth-box">
+            <div class="auth-top"><i class="fa-solid fa-person"></i></div>
+            <p id="verification-message" align="center" style="display: none;">The verification link is the "Log in to Feeld" button</p>
+            <div class="auth-card">
+               <form id="login-form" method="post" autocomplete="off">
+                  <div class="auth-row">
+                     <input id="email" type="text" placeholder="Email" required>
+                  </div>
+                  <div class="auth-row">
+                     <input id="btn-login" type="submit" value="Login">
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+
+      <script type="text/javascript" src="/vendor/jquery/jquery.min.js"></script>
+      <script type="text/javascript" src="/js/auth.js"></script>
+      <script type="text/javascript" src="/js/main.js"></script>
+   </body>
+</html>
