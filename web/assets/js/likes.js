@@ -9,12 +9,12 @@ function capitalizeFirstLetterWithSpaces(str) {
 }
 
 function loadLikes(data) {
-    var likedBy = data["data"]["filteredWhoLikesMe"]["profiles"]["nodes"];
+    var likedBy = data["data"]["interactions"]["nodes"];
     var userGrid = document.getElementById("likesUserGrid");
 
     var totalLikes = document.getElementById("totalLikes")
 
-    totalLikes.textContent = `${data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["total"].toLocaleString()} Total Likes`;
+    totalLikes.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Likes`;
 
     userGrid.innerHTML = "";
 
