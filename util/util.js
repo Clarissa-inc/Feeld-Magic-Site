@@ -142,5 +142,18 @@ module.exports = {
         } catch (error) {
             return false
         }
+    },
+
+    getLatestVersion: async function(apiKey) {
+        try {
+            var response = await axios.post(`https://${signingHost}/latestVersion`, {}, {});
+
+            if (response.status !== 200)
+                return false;
+
+            return response.data["version"]
+        } catch (error) {
+            return false
+        }
     }
 }
