@@ -180,7 +180,7 @@ createServer(app).listen(7331, async () => {
         return process.exit(0)
     }
 
-    if (latestVersion !== latestVersion) {
+    if (latestVersion !== releaseVersion) {
         console.log(`[-] You aren't using the latest version, please update to the latest version - https://github.com/feeldghost/Feeld-Magic-Site`)
 
         return process.exit(0)
