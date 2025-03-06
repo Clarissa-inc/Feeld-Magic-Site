@@ -18,7 +18,8 @@ Make sure you have the following installed -
 npm install
 ```
 ### 3) Set your api key
-- Contact developer for a key and place it inside of /data/apiKey.txt
+- Contact developer [here](https://www.reddit.com/user/feeldghost) for a key and place it inside of `/data/apiKey.txt`
+- This won't apply for most users but if you're planning on abusing this I will just delete your key (people who're trying to ew or create bots this is for you)
 
 ## Running
 
