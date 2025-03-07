@@ -128,7 +128,7 @@ app.get("/", async function(request, response) {
             }
         }
 
-        return response.render("index", { "siteVersion": api.release, "feeldVersion": feeld.version })
+        return response.render("index", { "siteVersion": api.version, "feeldVersion": feeld.version })
     } catch (error) {
         console.log("Error -", error)
 
