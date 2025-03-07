@@ -78,6 +78,7 @@ module.exports = {
             return { statusCode: response.status, data: response.data }
         } catch (error) {
             console.log(error)
+            console.log(JSON.stringify(error.response.data))
 
             return { statusCode: 500, data: {} }
         }

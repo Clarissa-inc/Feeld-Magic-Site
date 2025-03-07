@@ -3,14 +3,14 @@ function capitalizeFirstLetterWithSpaces(str) {
 }
 
 function loadLikes(data) {
-    var likedBy = data["data"]["interactions"]["nodes"];
+    var likedBy = data["data"]["filteredWhoLikesMe"]["profiles"]["nodes"];
     var userGrid = document.getElementById("likesUserGrid");
 
     notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
     var totalLikes = document.getElementById("totalLikes")
 
-    totalLikes.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Likes`;
+    totalLikes.textContent = `${data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["unfilteredTotal"].toLocaleString()} Total Likes`;
 
     userGrid.innerHTML = "";
 
