@@ -1,14 +1,15 @@
 // Libraries
 const { v4: randomUuid } = require("uuid")
+const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 const axios = require("axios")
 const https = require("https")
+const fs = require("fs")
 
 // Variables
 const signingHost = Buffer.from("ZmVlbGQuanVzdGFnaG9zdC5iaXo=", "base64")
-const sentryPublicKey = "9b7d845ff1ee4461a7129aecccd888d5"
 const hexadecimalCharacters = "0123456789abcdef"
-const feeldVersion = "7.22.0"
+var { feeld } = require("./config")
 
 // Firebase Headers
 var baseFirebaseHeaders = {
@@ -39,12 +40,12 @@ module.exports = {
             "accept": "*/*",
             "x-transaction-id": randomUuid(),
             "x-profile-id": profileId,
-            "x-app-version": feeldVersion,
+            "x-app-version": feeld.version,
             "sentry-trace": sentryTraceId,
             "baggage": [
                 `sentry-environment=production`,
-                `sentry-release=${feeldVersion}`,
-                `sentry-public_key=${sentryPublicKey}`,
+                `sentry-release=${feeld.version}`,
+                `sentry-public_key=${feeld.sentryPublicKey}`,
                 `sentry-trace_id=${sentryTraceId.split("-")[0]}`
             ].join(","),
             "x-device-os": "ios",
@@ -154,6 +155,23 @@ module.exports = {
             return response.data["version"]
         } catch (error) {
             return false
+        }
+    },
+
+    ensureAccessTokenIsValid: async function() {
+        var account = JSON.parse(fs.readFileSync("./data/account.json"))
+
+        var decodedAccessToken = jwt.decode(account["accessToken"])
+
+        if (decodedAccessToken["exp"] < Math.floor(Date.now() / 1000)) {
+            var newAccessToken = await this.refreshAccessToken(account["refreshToken"])
+
+            if (newAccessToken == false)
+                return response.status(500).json({ error: "Failed to refresh access token" })
+
+            account["accessToken"] = newAccessToken
+
+            fs.writeFileSync("./data/account.json", JSON.stringify(account, null, "\t"));
         }
     }
 }

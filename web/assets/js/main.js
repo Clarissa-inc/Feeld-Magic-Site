@@ -73,6 +73,11 @@ navLinks.forEach((link) => {
 
         var target = link.getAttribute("href").substring(1);
 
+        if (target !== "likes") {
+            notify("Not implemented yet (just the likes tab for now)")
+            return
+        }
+
         if (target == "likes") {
             var response = await backendRequest("/feeldRequest", {
                 operationName: "WhoLikesMe",
