@@ -1,5 +1,8 @@
 # Feeld Magic Site
 
+## Information/Important
+- This will only work if registered via **email** - it doesn't support the third party logins like `Apple`, `Facebook` & `Google`
+
 ## Requirements
 
 Make sure you have the following installed -
