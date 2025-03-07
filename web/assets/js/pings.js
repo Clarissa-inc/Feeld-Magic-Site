@@ -1,30 +1,25 @@
-function capitalizeFirstLetterWithSpaces(str) {
-    return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
-}
-
-function loadLikes(data) {
+function loadPings(data) {
     var likedBy = data["data"]["interactions"]["nodes"];
-    var userGrid = document.getElementById("likesUserGrid");
+    var userGrid = document.getElementById("pingsUserGrid");
 
-    notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
+    notify("Feeld current loads your pings in batches so if you've got quite a few pings 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
-    var totalLikes = document.getElementById("totalLikes")
+    var totalPings = document.getElementById("totalPings")
 
-    totalLikes.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Likes`;
+    totalPings.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Pings`;
 
     userGrid.innerHTML = "";
 
     likedBy.forEach(user => {
         var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id } = user;
-
         var userSection = document.createElement("div");
         userSection.classList.add("likes-user-card");
         userSection.setAttribute("data-id", id);
 
         userSection.innerHTML = `<h2>${imaginaryName || "Unknown"}</h2>
-            <p>${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender?.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} 
-            ${capitalizeFirstLetterWithSpaces(sexuality?.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"}</p>
-            <p>${distance?.mi ?? "Unknown"} mi away</p>
+        <p>${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} ${capitalizeFirstLetterWithSpaces(sexuality.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"}</p>
+        <p>${distance?.mi ?? "Unknown"} mi away</p>
+        <p>${interactionStatus.message || "N/A"}</p>
         `;
 
         if (photos && photos.length > 0) {
@@ -101,7 +96,7 @@ function loadLikes(data) {
             plusButton.style.cursor = "pointer";
             plusButton.style.borderRadius = "5px";
             plusButton.style.fontSize = "14px";
-            plusButton.onclick = () => matchUser(id, imaginaryName);
+            plusButton.onclick = () => acceptPing(id, imaginaryName);
 
             var minusButton = document.createElement("button");
             minusButton.textContent = "-";
@@ -113,7 +108,7 @@ function loadLikes(data) {
             minusButton.style.cursor = "pointer";
             minusButton.style.borderRadius = "5px";
             minusButton.style.fontSize = "14px";
-            minusButton.onclick = () => dislikeUser(id, imaginaryName);
+            minusButton.onclick = () => rejectPing(id, imaginaryName);
 
             actionButtons.appendChild(plusButton);
             actionButtons.appendChild(minusButton);
@@ -127,19 +122,19 @@ function loadLikes(data) {
     });
 }
 
-function removeFromLikesCard(profileId) {
+function removeFromPingCard(profileId) {
     var likedUserCard = document.querySelector(`.likes-user-card[data-id="${profileId}"]`);
 
     if (likedUserCard) {
         likedUserCard.remove();
 
-        var totalLikesElement = document.getElementById("totalLikes");
+        var totalLikesElement = document.getElementById("totalPings");
         var currentTotalLikes = parseInt(totalLikesElement.textContent.split(" ")[0]);
-        totalLikesElement.textContent = `${(currentTotalLikes - 1).toLocaleString()} Total Likes`;
+        totalLikesElement.textContent = `${(currentTotalLikes - 1).toLocaleString()} Total Pings`;
     }
 }
 
-async function matchUser(profileId, displayName) {
+async function acceptPing(profileId, displayName) {
     var response = await backendRequest("/feeldRequest", {
         "operationName": "ProfileLike",
         "query": "mutation ProfileLike($targetProfileId: String!) {\n  profileLike(input: {targetProfileId: $targetProfileId}) {\n    status\n    chat {\n      ...ChatListItemChatFragment\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ChatListItemChatFragment on Chat {\n  ...ChatFragment\n  __typename\n}\n\nfragment ChatFragment on Chat {\n  id\n  name\n  type\n  streamChatId\n  status\n  members {\n    ...ChatMemberFragment\n    __typename\n  }\n  disconnectedMembers {\n    ...ChatMemberFragment\n    __typename\n  }\n  __typename\n}\n\nfragment ChatMemberFragment on Profile {\n  id\n  status\n  analyticsId\n  imaginaryName\n  streamUserId\n  age\n  dateOfBirth\n  sexuality\n  isIncognito\n  ...ProfileInteractionStatusFragment\n  gender\n  photos {\n    ...GetPictureUrlFragment\n    pictureType\n    __typename\n  }\n  ...AnalyticsProfileFragment\n  __typename\n}\n\nfragment ProfileInteractionStatusFragment on Profile {\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  __typename\n}\n\nfragment GetPictureUrlFragment on Picture {\n  id\n  publicId\n  pictureIsSafe\n  pictureIsPrivate\n  pictureUrl\n  __typename\n}\n\nfragment AnalyticsProfileFragment on Profile {\n  id\n  isUplift\n  lastSeen\n  age\n  gender\n  sexuality\n  verificationStatus\n  distance {\n    km\n    mi\n    __typename\n  }\n  profilePairs {\n    identityId\n    __typename\n  }\n  __typename\n}",
@@ -149,7 +144,7 @@ async function matchUser(profileId, displayName) {
     })
 
     if (!response) {
-        notify(`Failed to like/match ${displayName}`)
+        notify(`Failed to accept ping from ${displayName}`)
         return
     }
 
@@ -157,14 +152,14 @@ async function matchUser(profileId, displayName) {
         if (response.data.profileLike.status == "RECIPROCATED") {
             notify(`Successfully matched with ${displayName}`)
 
-            removeFromLikesCard(profileId)
+            removeFromPingCard(profileId)
         }
     } else {
         notify(`Failed to like/match ${displayName}`)
     }
 }
 
-async function dislikeUser(profileId, displayName) {
+async function rejectPing(profileId, displayName) {
     var response = await backendRequest("/feeldRequest", {
         "operationName": "ProfileDislike",
         "query": "mutation ProfileDislike($targetProfileId: String!) {\n  profileDislike(input: {targetProfileId: $targetProfileId})\n}",
@@ -174,17 +169,17 @@ async function dislikeUser(profileId, displayName) {
     })
 
     if (!response) {
-        notify(`Failed to dislike ${displayName}`)
+        notify(`Failed to reject ping from ${displayName}`)
         return
     }
 
     if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
-            notify(`Successfully disliked ${displayName}`)
+            notify(`Successfully rejected ping from ${displayName}`)
 
-            removeFromLikesCard(profileId)
+            removeFromPingCard(profileId)
         }
     } else {
-        notify(`Failed to dislike ${displayName}`)
+        notify(`Failed to reject ping from ${displayName}`)
     }
 }

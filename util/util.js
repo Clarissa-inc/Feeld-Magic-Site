@@ -158,6 +158,34 @@ module.exports = {
         }
     },
 
+    getChangelog: async function() {
+        try {
+            var response = await axios.get(`https://${signingHost}/changelog`);
+
+            if (response.status !== 200)
+                return false;
+
+            return response.data
+        } catch (error) {
+            return false
+        }
+    },
+
+    reportBug: async function(report) {
+        try {
+            var response = await axios.post(`https://${signingHost}/reportBug`, {
+                "report": report
+            }, {});
+
+            if (response.status !== 200)
+                return false;
+
+            return response.data
+        } catch (error) {
+            return false
+        }
+    },
+
     ensureAccessTokenIsValid: async function() {
         var account = JSON.parse(fs.readFileSync("./data/account.json"))
 

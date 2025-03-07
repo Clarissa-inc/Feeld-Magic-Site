@@ -28,6 +28,14 @@
 <body>
     <div id="notification-container" class="notification-container"></div>
 
+    <div id="reportBugPopout" class="popup">
+        <div class="popup-content">
+            <textarea id="bugDescription" maxlength="1500" placeholder="Describe the issue..."></textarea>
+            <button class="btn-report" onclick="submitReport()">Report</button>
+            <button class="btn-report" onclick="closeReportPopout()">Cancel</button>
+        </div>
+    </div>
+
     <div class="main-container">
         <header class="header">
             <div class="header-content">
@@ -35,13 +43,19 @@
                 <p class="app-subtitle">v<%- siteVersion %> (v<%- feeldVersion %>)</p>
             </div>
             <div class="header-actions">
-                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+                <div class="header-button-container">
+                    <button class="btn-logout" onclick="handleReport()">Report Bug</button>
+                    <button class="btn-logout" onclick="handleLogout()">Logout</button>
+                </div>
             </div>
         </header>
 
         <div class="content-layout">
             <aside class="sidebar">
                 <nav class="navigation-menu">
+                    <a href="#dashboard" class="nav-link active">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </a>
                     <a href="#swipe" class="nav-link">
                         <i class="fa-solid fa-heart"></i> Swipe
                     </a>
@@ -61,13 +75,60 @@
             </aside>
 
             <main class="main-content">
+                <section id="dashboard" class="content-section active">
+                    <div id="settingsContainer" class="tab-container">
+                        <section id="profileSection">
+                            <div class="settings-grid">
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <div class="form-group">
+                                            <label for="">Email</label>
+                                            <input type="text" readonly value="<%= profileQueryResponse.data.account.email %>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">Display Name</label>
+                                            <input type="text" readonly value="<%= profileQueryResponse.data.account.profiles[0].imaginaryName %>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">Gender</label>
+                                            <input type="text" readonly id="gender" value="<%= profileQueryResponse.data.account.profiles[0].gender %>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">Sexuality</label>
+                                            <input type="text" id="sexuality" readonly value="<%= profileQueryResponse.data.account.profiles[0].sexuality %>">
+                                        </div>
+                                    </section>
+                                </div>
+
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <div class="form-group">
+                                            <label for="">Changelog</label>
+                                            <textarea id="changelog" rows="14" readonly><%= changelog.map(log => `${log}`).join("\n") %></textarea>
+                                    </section>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
                 <section id="likes" class="content-section hidden">
                     <div id="likesContainer" class="tab-container">
                         <div class="tab">
                             <div style="text-align: center;">
-                                <label id="totalLikes" for="totalLikes">? Total Likes (Awaiting data)</label>
+                                <label id="totalLikes" for="totalLikes">? Total Likes</label>
                             </div>
                         <div id="likesUserGrid" class="likes-user-grid"></div>
+                    </div>
+                </section>
+
+                <section id="pings" class="content-section hidden">
+                    <div id="pingsContainer" class="tab-container">
+                        <div class="tab">
+                            <div style="text-align: center;">
+                                <label id="totalPings" for="totalPings">? Total Pings</label>
+                            </div>
+                            <div id="pingsUserGrid" class="likes-user-grid"></div>
+                        </div>
                     </div>
                 </section>
             </main>
@@ -79,6 +140,7 @@
     <script type="text/javascript" src="/vendor/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript" src="/js/likes.js"></script>
+    <script type="text/javascript" src="/js/pings.js"></script>
 </body>
 
 </html>
