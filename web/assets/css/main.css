@@ -145,6 +145,7 @@ body {
     flex-direction: column;
     padding: 1rem;
     background-color: #1e1e2f;
+    background: rgba(20, 20, 30, 0.8);
 }
 
 .navigation-menu {
