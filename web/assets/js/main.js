@@ -100,7 +100,7 @@ navLinks.forEach((link) => {
         var target = link.getAttribute("href").substring(1);
 
         if (target !== "dashboard" && target !== "likes" && target !== "pings") {
-            notify("Not implemented yet (just the likes tab for now)")
+            notify("Not implemented yet (only dashboard, likes & pings for now)")
             return
         }
 
