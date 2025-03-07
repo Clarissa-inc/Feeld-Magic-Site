@@ -88,7 +88,7 @@ module.exports = {
             var headers = baseFirebaseHeaders
 
             headers["x-firebase-gmpid"] = `1:594152761603:ios:${this.generateGmpid()}`
-            headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeldVersion} iPhone/18.3.1 hw/iPhone16_1`
+            headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeld.version} iPhone/18.3.1 hw/iPhone16_1`
 
             var response = await axios.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/emailLinkSignin?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA", jsonData, {
                 headers: baseFirebaseHeaders
@@ -107,7 +107,7 @@ module.exports = {
             var headers = baseFirebaseHeaders
 
             headers["x-firebase-gmpid"] = `1:594152761603:ios:${this.generateGmpid()}`
-            headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeldVersion} iPhone/18.3.1 hw/iPhone16_1`
+            headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeld.version} iPhone/18.3.1 hw/iPhone16_1`
 
             var response = await axios.post(`https://securetoken.googleapis.com/v1/token?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA`, {
                 "grantType": "refresh_token",
