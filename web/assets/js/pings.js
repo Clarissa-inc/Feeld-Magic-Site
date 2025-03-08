@@ -11,15 +11,23 @@ function loadPings(data) {
     userGrid.innerHTML = "";
 
     likedBy.forEach(user => {
-        var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id } = user;
+        var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id, lastSeen } = user;
         var userSection = document.createElement("div");
         userSection.classList.add("likes-user-card");
         userSection.setAttribute("data-id", id);
 
-        userSection.innerHTML = `<h2>${imaginaryName || "Unknown"}</h2>
-        <p>${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} ${capitalizeFirstLetterWithSpaces(sexuality.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"}</p>
-        <p>${distance?.mi ?? "Unknown"} mi away</p>
-        <p>${interactionStatus.message || "N/A"}</p>
+        var baseInformation = `<h2 class="cleanText">${imaginaryName || "Unknown"}</h2>`
+
+        if (lastSeen) {
+            baseInformation = baseInformation + `
+                <p class="cleanText">${formatLastSeenTimestamp(lastSeen)}</p>
+            `
+        }
+
+        userSection.innerHTML = `${baseInformation}
+        <p class="cleanText">${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} ${capitalizeFirstLetterWithSpaces(sexuality.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"}</p>
+        <p class="cleanText">${distance?.mi ?? "Unknown"} mi away</p>
+        <p class="cleanText">${interactionStatus.message || "N/A"}</p>
         `;
 
         if (photos && photos.length > 0) {
@@ -115,7 +123,7 @@ function loadPings(data) {
 
             userSection.appendChild(actionButtons);
         } else {
-            userSection.innerHTML += `<p>No photos (this should never happen)</p>`;
+            userSection.innerHTML += `<p class="cleanText">No photos (this should never happen)</p>`;
         }
 
         userGrid.appendChild(userSection);

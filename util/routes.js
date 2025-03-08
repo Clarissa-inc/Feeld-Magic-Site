@@ -30,7 +30,7 @@ app.post("/feeldRequest", async function(request, response) {
         if (operationName === "SignInLink")
             headers = util.generateFeeldHeaders(false, "null")
 
-        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe") {
+        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe" || operationName == "DiscoverProfiles") {
             await util.ensureAccessTokenIsValid()
 
             var account = JSON.parse(fs.readFileSync("./data/account.json"))

@@ -111,11 +111,89 @@
                     </div>
                 </section>
 
+                <section id="swipe" class="content-section hidden">
+                    <div id="settingsContainer" class="tab-container">
+                        <section id="profileSection">
+                            <div class="settings-grid">
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <section class="settings-box" id="photoContainer"></section>
+                                    </section>
+                                </div>
+
+                                <div class="settings-column">
+                                    <section class="settings-group">
+                                        <div class="new-layout-row">
+                                            <div class="new-layout-box">
+                                                <p class="cleanText" id="swipeDisplayNameText"></p>
+                                            </div>
+                                            <div class="new-layout-box">
+                                                <p class="cleanText" id="swipeAgeText"></p>
+                                            </div>
+                                            <div class="new-layout-box">
+                                                <p class="cleanText" id="swipeGenderText"></p>
+                                            </div>
+                                            <div class="new-layout-box">
+                                                <p class="cleanText" id="swipeSexualityText"></p>
+                                            </div>
+                                            <div class="new-layout-box">
+                                                <p class="cleanText" id="swipeDistanceText"></p>
+                                            </div>
+                                            <div class="new-layout-box" id="swipeLastSeenBox" style="display: none;">
+                                                <p class="cleanText" id="swipeLastSeenText"></p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section class="settings-group">
+                                        <section class="settings-box">
+                                            <label class="cleanText">Extra</label>
+                                            <p class="cleanText" id="hasUserLikedYou"></p>
+                                        </section>
+                                    </section>
+
+                                    <section class="settings-group">
+                                        <section class="settings-box">
+                                            <label class="cleanText">Desires</label>
+                                            <p class="cleanText" id="desiresText"></p>
+                                        </section>
+                                    </section>
+
+                                    <section class="settings-group">
+                                        <section class="settings-box">
+                                            <label class="cleanText">Interests</label>
+                                            <p class="cleanText" id="interestsText"></p>
+                                        </section>
+                                    </section>
+
+                                    <section class="settings-group">
+                                        <section class="settings-box">
+                                            <label class="cleanText">Bio</label>
+                                            <br>
+                                            <textarea class="swipeBioText" id="swipeBioText" rows="12" readonly></textarea>
+                                        </section>
+                                    </section>
+
+                                    <section class="settings-group">
+                                        <section class="settings-box">
+                                            <div class="spaced-button-container">
+                                                <button id="sipweLikeProfileButton" class="btn-swipe-user" onclick="swipeLikeUser()">Like</button>
+                                                <button id="swipeRejectProfileButton" class="btn-swipe-user" onclick="swipeRejectUser()">Reject</button>
+                                            </div>
+                                        </section>
+                                    </section>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+
                 <section id="likes" class="content-section hidden">
                     <div id="likesContainer" class="tab-container">
                         <div class="tab">
                             <div style="text-align: center;">
-                                <label id="totalLikes" for="totalLikes">? Total Likes</label>
+                                <label class="cleanText" id="totalLikes" for="totalLikes">? Total Likes</label>
                             </div>
                         <div id="likesUserGrid" class="likes-user-grid"></div>
                     </div>
@@ -125,7 +203,7 @@
                     <div id="pingsContainer" class="tab-container">
                         <div class="tab">
                             <div style="text-align: center;">
-                                <label id="totalPings" for="totalPings">? Total Pings</label>
+                                <label class="cleanText" id="totalPings" for="totalPings">? Total Pings</label>
                             </div>
                             <div id="pingsUserGrid" class="likes-user-grid"></div>
                         </div>
@@ -141,6 +219,11 @@
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript" src="/js/likes.js"></script>
     <script type="text/javascript" src="/js/pings.js"></script>
+    <script type="text/javascript" src="/js/swiping.js"></script>
+
+    <script>
+        const profile = <%- JSON.stringify(profileQueryResponse.data.account.profiles[0]) %>;
+    </script>
 </body>
 
 </html>

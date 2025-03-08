@@ -15,16 +15,24 @@ function loadLikes(data) {
     userGrid.innerHTML = "";
 
     likedBy.forEach(user => {
-        var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id } = user;
+        var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id, lastSeen } = user;
 
         var userSection = document.createElement("div");
         userSection.classList.add("likes-user-card");
         userSection.setAttribute("data-id", id);
 
-        userSection.innerHTML = `<h2>${imaginaryName || "Unknown"}</h2>
-            <p>${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender?.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} 
+        var baseInformation = `<h2 class="cleanText">${imaginaryName || "Unknown"}</h2>`
+
+        if (lastSeen) {
+            baseInformation = baseInformation + `
+                <p class="cleanText">${formatLastSeenTimestamp(lastSeen)}</p>
+            `
+        }
+
+        userSection.innerHTML = `${baseInformation}
+            <p class="cleanText">${age || "Unknown"} ${capitalizeFirstLetterWithSpaces(gender?.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"} 
             ${capitalizeFirstLetterWithSpaces(sexuality?.toLowerCase().replaceAll("_", " ").replaceAll("-", "")) || "Unknown"}</p>
-            <p>${distance?.mi ?? "Unknown"} mi away</p>
+            <p class="cleanText">${distance?.mi ?? "Unknown"} mi away</p>
         `;
 
         if (photos && photos.length > 0) {
@@ -174,17 +182,17 @@ async function dislikeUser(profileId, displayName) {
     })
 
     if (!response) {
-        notify(`Failed to dislike ${displayName}`)
+        notify(`Failed to reject ${displayName}`)
         return
     }
 
     if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
-            notify(`Successfully disliked ${displayName}`)
+            notify(`Successfully rejected ${displayName}`)
 
             removeFromLikesCard(profileId)
         }
     } else {
-        notify(`Failed to dislike ${displayName}`)
+        notify(`Failed to reject ${displayName}`)
     }
 }
