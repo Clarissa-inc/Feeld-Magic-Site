@@ -102,7 +102,7 @@ navLinks.forEach((link) => {
         var target = link.getAttribute("href").substring(1);
 
         if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings") {
-            notify("Not implemented yet (only dashboard, swipe, likes & pings for now)")
+            notify("Not implemented yet (only dashboard, swipe, likes & pings, settings for now)")
             return
         }
 
