@@ -1,10 +1,3 @@
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
-    document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
-
-    addBioChangeEvent()
-});
-
 function notify(message) {
     var container = document.getElementById("notification-container");
     var notification = document.createElement("div");

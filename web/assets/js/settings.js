@@ -130,11 +130,11 @@ function handleDesires(desires) {
     categories.forEach(category => {
         const categoryDiv = document.createElement("div");
         categoryDiv.classList.add("compact-category");
-        categoryDiv.classList.add("niceText")
+        categoryDiv.classList.add("cleanText")
 
         const categoryTitle = document.createElement("h4");
         categoryTitle.textContent = category.localisedCategory;
-        categoryTitle.classList.add("niceText")
+        categoryTitle.classList.add("cleanText")
         categoryDiv.appendChild(categoryTitle);
 
         const desiresList = document.createElement("ul");
@@ -144,6 +144,7 @@ function handleDesires(desires) {
             const desireItem = document.createElement("li");
             desireItem.textContent = capitalizeFirstLetterWithSpaces(desire.localisedString);
             desireItem.classList.add("compact-item");
+            desireItem.classList.add("cleanText");
             desireItem.setAttribute("data-desire", key);
 
             if (currentDesires.has(key)) {
@@ -192,9 +193,11 @@ function handleLookingFor(currentLookingForArr) {
 
     const categoryDiv = document.createElement("div");
     categoryDiv.classList.add("compact-category");
+    categoryDiv.classList.add("cleanText");
 
     const categoryTitle = document.createElement("h4");
     categoryTitle.textContent = "Options"
+    categoryTitle.classList.add("cleanText");
     categoryDiv.appendChild(categoryTitle);
 
     const lookingForList = document.createElement("ul");
@@ -204,6 +207,7 @@ function handleLookingFor(currentLookingForArr) {
         const lookingForItem = document.createElement("li");
         lookingForItem.textContent = lookingFor;
         lookingForItem.classList.add("compact-item");
+        lookingForItem.classList.add("cleanText");
         lookingForItem.setAttribute("data-lookingFor", key);
 
         if (currentLookingFor.has(key)) {

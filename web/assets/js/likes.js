@@ -1,3 +1,5 @@
+var totalLikesEle = 0
+
 function capitalizeFirstLetterWithSpaces(str) {
     return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 }
@@ -9,6 +11,8 @@ function loadLikes(data) {
     notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
     var totalLikes = document.getElementById("totalLikes")
+
+    totalLikesEle = data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["unfilteredTotal"]
 
     totalLikes.textContent = `${data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["unfilteredTotal"].toLocaleString()} Total Likes`;
 
@@ -140,10 +144,10 @@ function removeFromLikesCard(profileId) {
 
     if (likedUserCard) {
         likedUserCard.remove();
+        totalLikesEle = totalLikesEle - 1;
 
         var totalLikesElement = document.getElementById("totalLikes");
-        var currentTotalLikes = parseInt(totalLikesElement.textContent.split(" ")[0]);
-        totalLikesElement.textContent = `${(currentTotalLikes - 1).toLocaleString()} Total Likes`;
+        totalLikesElement.textContent = `${(totalLikesEle).toLocaleString()} Total Likes`;
     }
 }
 
@@ -168,7 +172,11 @@ async function matchUser(profileId, displayName) {
             removeFromLikesCard(profileId)
         }
     } else {
-        notify(`Failed to like/match ${displayName}`)
+        if (response.errors) {
+            notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to like/match ${displayName} - Unknown reason`)
+        }
     }
 }
 
@@ -193,6 +201,10 @@ async function dislikeUser(profileId, displayName) {
             removeFromLikesCard(profileId)
         }
     } else {
-        notify(`Failed to reject ${displayName}`)
+        if (response.errors) {
+            notify(`Failed to reject ${displayName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to reject ${displayName} - Unknown reason`)
+        }
     }
 }

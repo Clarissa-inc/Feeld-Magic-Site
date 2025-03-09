@@ -1,3 +1,12 @@
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
+    document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
+
+    addBioChangeEvent()
+});
+
+var totalPingsEle = 0
+
 function loadPings(data) {
     var likedBy = data["data"]["interactions"]["nodes"];
     var userGrid = document.getElementById("pingsUserGrid");
@@ -5,6 +14,8 @@ function loadPings(data) {
     notify("Feeld current loads your pings in batches so if you've got quite a few pings 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
     var totalPings = document.getElementById("totalPings")
+
+    totalPingsEle = data["data"]["interactions"]["pageInfo"]["total"]
 
     totalPings.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Pings`;
 
@@ -135,10 +146,10 @@ function removeFromPingCard(profileId) {
 
     if (likedUserCard) {
         likedUserCard.remove();
+        totalPingsEle = totalPingsEle -1;
 
         var totalLikesElement = document.getElementById("totalPings");
-        var currentTotalLikes = parseInt(totalLikesElement.textContent.split(" ")[0]);
-        totalLikesElement.textContent = `${(currentTotalLikes - 1).toLocaleString()} Total Pings`;
+        totalLikesElement.textContent = `${(totalPingsEle).toLocaleString()} Total Pings`;
     }
 }
 
@@ -163,7 +174,11 @@ async function acceptPing(profileId, displayName) {
             removeFromPingCard(profileId)
         }
     } else {
-        notify(`Failed to like/match ${displayName}`)
+        if (response.errors) {
+            notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to like/match ${displayName} - Unknown reason`)
+        }
     }
 }
 
@@ -188,6 +203,10 @@ async function rejectPing(profileId, displayName) {
             removeFromPingCard(profileId)
         }
     } else {
-        notify(`Failed to reject ping from ${displayName}`)
+        if (response.errors) {
+            notify(`Failed to reject ping from ${displayName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to reject ping from ${displayName} - Unknown reason`)
+        }
     }
 }

@@ -146,6 +146,9 @@ app.get("/", async function(request, response) {
             return response.status(500).json({ error: "Failed to get profile information, this should never happen" })
         }
 
+        if (profileQueryResponse.data.errors)
+            return response.status(500).json({ error: profileQueryResponse.data.errors[0].message })
+
         var changelog = await util.getChangelog()
 
         if (!changelog) {

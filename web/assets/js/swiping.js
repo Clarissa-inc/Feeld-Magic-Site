@@ -50,10 +50,10 @@ function loadUserInSwipe() {
     document.getElementById("interestsText").textContent = interests?.length ? interests.map(i => capitalizeFirstLetterWithSpaces(i.replaceAll("_", " "))).join(", ") : "N/A";
 
     if (user.interactionStatus?.theirs === "LIKED") {
-        document.getElementById("hasUserLikedYou").textContent = `This user has already liked you, like back to match`;
+        document.getElementById("hasUserLikedYou").textContent = "This user has liked you, like back to match";
         document.getElementById("sipweLikeProfileButton").textContent = "Match";
     } else {
-        document.getElementById("hasUserLikedYou").textContent = `This user hasn't already liked you`;
+        document.getElementById("hasUserLikedYou").textContent = `This user has not liked you`;
         document.getElementById("sipweLikeProfileButton").textContent = "Like";
     }
 
@@ -149,7 +149,11 @@ async function swipeLikeUser() {
             handleSwipe()
         }
     } else {
-        notify(`Failed to like/match ${currentSwipeUser.imaginaryName}`)
+        if (response.errors) {
+            notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - Unknown reason`)
+        }
     }
 }
 
@@ -176,7 +180,11 @@ async function swipeRejectUser() {
             handleSwipe()
         }
     } else {
-        notify(`Failed to reject ${currentSwipeUser.imaginaryName}`)
+        if (response.errors) {
+            notify(`Failed to reject ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
+        } else {
+            notify(`Failed to reject ${currentSwipeUser.imaginaryName} - Unknown reason`)
+        }
     }
 }
 
