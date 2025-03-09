@@ -10,6 +10,7 @@
 Make sure you have the following installed -
 
 - [Node.js](https://nodejs.org/)
+- **I'd recommend version `v18.17.0`**
 
 ## Installation
 
