@@ -23,7 +23,7 @@ $(document).ready(function() {
                     "query": "mutation SignInLink($input: SendSignInLinkInput!) {\n  sendSignInLink(input: $input)\n}",
                     "variables": {
                         "input": {
-                            "email": email,
+                            "email": email.toLowerCase(),
                             "isSignUpFlow": false,
                             "language": "ENGLISH_BRITISH"
                         }
