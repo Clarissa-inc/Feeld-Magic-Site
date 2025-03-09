@@ -1,6 +1,7 @@
 # Feeld Magic Site
 
 ## Information/Important
+- **For mac users don't use Safari as it causes problems and it won't work**
 - This will only work if registered via **email** - it doesn't support the third party logins like `Apple`, `Facebook` & `Google`
 - Settings won't ever include an option to upload pictures because i don't want to help catfishing/bots
 
