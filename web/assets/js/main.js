@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
     document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
+
+    addBioChangeEvent()
 });
 
 function notify(message) {
@@ -99,7 +101,7 @@ navLinks.forEach((link) => {
 
         var target = link.getAttribute("href").substring(1);
 
-        if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings") {
+        if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings") {
             notify("Not implemented yet (only dashboard, swipe, likes & pings for now)")
             return
         }
@@ -114,7 +116,7 @@ navLinks.forEach((link) => {
                             "ageRange": profile.ageRange,
                             "lookingFor": profile.lookingFor,
                             "maxDistance": profile.distanceMax,
-                            "recentlyOnline": false
+                            "recentlyOnline": true
                         }
                     }
                 }
@@ -130,6 +132,8 @@ navLinks.forEach((link) => {
             } else {
                 currentSwipeUsers = response
                 loadUserInSwipe()
+
+                notify("Only showing the people who've been active in the last 7 days (:")
             }
         } else if (target == "likes") {
             var response = await backendRequest("/feeldRequest", {
@@ -169,6 +173,37 @@ navLinks.forEach((link) => {
                 notify(response.errors[0].message)
             } else {
                 loadPings(response)
+            }
+        } else if (target == "settings") {
+            var response = await await backendRequest("/feeldRequest", {
+                "operationName": "AccountHome",
+                "query": "query AccountHome($profileId: String!) {\n  account {\n    firebaseId\n    availablePings\n    isUplift\n    __typename\n  }\n  profile(id: $profileId) {\n    ...AccountHomeProfileFragment\n    __typename\n  }\n}\n\nfragment AccountHomeProfileFragment on Profile {\n  id\n  age\n  bio\n  dateOfBirth\n  desires\n  gender\n  imaginaryName\n  interests\n  photos {\n    ...PhotoCarouselPictureFragment\n    __typename\n  }\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  sexuality\n  status\n  verificationStatus\n  __typename\n}\n\nfragment PhotoCarouselPictureFragment on Picture {\n  id\n  pictureIsPrivate\n  pictureIsSafe\n  pictureStatus\n  pictureType\n  pictureUrl\n  publicId\n  verification {\n    status\n    __typename\n  }\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}",
+                "variables": {
+                    "profileId": profile.id
+                }
+            })
+
+            var searchSettingsResponse = await await backendRequest("/feeldRequest", {
+                "operationName": "DiscoverSearchSettingsQuery",
+                "query": "query DiscoverSearchSettingsQuery($profileId: String!) {\n  profile(id: $profileId) {\n    ...DiscoverSearchSettingsFragment\n    __typename\n  }\n}\n\nfragment DiscoverSearchSettingsFragment on Profile {\n  id\n  status\n  ageRange\n  desiringFor\n  distanceMax\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  lookingFor\n  recentlyOnline\n  allowPWM\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}",
+                "variables": {
+                    "profileId": profile.id
+                }
+            })
+
+            if (!response || !searchSettingsResponse) {
+                notify("Failed to get current settings")
+                return
+            }
+
+            if (response.errors) {
+                notify(response.errors[0].message)
+            } else if (searchSettingsResponse.errors) {
+                notify(searchSettingsResponse.errors[0].message)
+            } else {
+                setAccountInformation(response, searchSettingsResponse)
+
+                notify("Settings isn't finished yet sorry pookies")
             }
         }
 

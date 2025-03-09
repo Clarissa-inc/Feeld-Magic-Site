@@ -185,6 +185,11 @@ async function handleSwipe() {
         return
     }
 
+    if (!currentSwipeUsers.data.discovery.hasNextBatch) {
+        notify("You're ran out of people to swipe")
+        return
+    }
+
     currentSwipeUsers.data.discovery.nodes.shift()
 
     if (currentSwipeUsers.data.discovery.nodes.length > 0) {
@@ -201,7 +206,7 @@ async function handleSwipe() {
                         "ageRange": profile.ageRange,
                         "lookingFor": profile.lookingFor,
                         "maxDistance": profile.distanceMax,
-                        "recentlyOnline": false
+                        "recentlyOnline": true
                     }
                 }
             }

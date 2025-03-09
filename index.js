@@ -35,7 +35,9 @@ createServer(app).listen(7331, async () => {
     }
 
     if (latestVersion !== api.version) {
-        console.log(`[-] You aren't using the latest version, please update to the latest version - https://github.com/feeldghost/Feeld-Magic-Site`)
+        var changelog = await util.getChangelog()
+
+        console.log(`[-] You aren't using the latest version (${api.version}), please update to the latest version - https://github.com/feeldghost/Feeld-Magic-Site\n\n[?] Latest version --> ${changelog[changelog.length -1]}`)
 
         return process.exit(0)
     }

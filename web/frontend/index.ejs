@@ -82,19 +82,19 @@
                                 <div class="settings-column">
                                     <section class="settings-box">
                                         <div class="form-group">
-                                            <label for="">Email</label>
+                                            <label>Email</label>
                                             <input type="text" readonly value="<%= profileQueryResponse.data.account.email %>">
                                         </div>
                                         <div class="form-group">
-                                            <label for="">Display Name</label>
+                                            <label>Display Name</label>
                                             <input type="text" readonly value="<%= profileQueryResponse.data.account.profiles[0].imaginaryName %>">
                                         </div>
                                         <div class="form-group">
-                                            <label for="">Gender</label>
+                                            <label>Gender</label>
                                             <input type="text" readonly id="gender" value="<%= profileQueryResponse.data.account.profiles[0].gender %>">
                                         </div>
                                         <div class="form-group">
-                                            <label for="">Sexuality</label>
+                                            <label>Sexuality</label>
                                             <input type="text" id="sexuality" readonly value="<%= profileQueryResponse.data.account.profiles[0].sexuality %>">
                                         </div>
                                     </section>
@@ -103,7 +103,7 @@
                                 <div class="settings-column">
                                     <section class="settings-box">
                                         <div class="form-group">
-                                            <label for="">Changelog</label>
+                                            <label>Changelog</label>
                                             <textarea id="changelog" rows="14" readonly><%= changelog.map(log => `${log}`).join("\n") %></textarea>
                                     </section>
                             </div>
@@ -193,7 +193,7 @@
                     <div id="likesContainer" class="tab-container">
                         <div class="tab">
                             <div style="text-align: center;">
-                                <label class="cleanText" id="totalLikes" for="totalLikes">? Total Likes</label>
+                                <label class="cleanText" id="totalLikes">? Total Likes</label>
                             </div>
                         <div id="likesUserGrid" class="likes-user-grid"></div>
                     </div>
@@ -203,10 +203,87 @@
                     <div id="pingsContainer" class="tab-container">
                         <div class="tab">
                             <div style="text-align: center;">
-                                <label class="cleanText" id="totalPings" for="totalPings">? Total Pings</label>
+                                <label class="cleanText" id="totalPings">? Total Pings</label>
                             </div>
                             <div id="pingsUserGrid" class="likes-user-grid"></div>
                         </div>
+                    </div>
+                </section>
+
+                <section id="settings" class="content-section hidden">
+                    <div id="settingsContainer" class="tab-container">
+                        <section id="profileSection">
+                            <div class="settings-grid">
+
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <form id="profile-form">
+                                            <div class="form-group">
+                                                <label class="cleanText">Display Name</label>
+                                                <input type="text" maxlength="1500" id="profileDisplayName" autocomplete="off">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="cleanText">Date of Birth</label>
+                                                <input type="text" id="profileDateOfBirth" readonly value="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="cleanText">Gender</label>
+                                                <select id="gender-selector"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="cleanText">Sexuality</label>
+                                                <select id="sexuality-selector"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="range-container">
+                                                    <label class="cleanText">Bio</label>
+                                                    <label id="charCount">1500 characters remaining</label>
+                                                </div>
+                                                <textarea id="profileBio" maxlength="1500" rows="5" autocomplete="off"></textarea>
+                                            </div>
+                                        </form>
+                                        <form id="picture-form">
+                                            <label class="cleanText" id="settingsProfilePicturesLabel">Profile Pictures (0/6)</label>
+                                            <div id="photoGrid" class="compact-grid">
+                                        </form>
+                                    </section>
+                                </div>
+
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <div class="form-group">
+                                            <label class="cleanText">Location Changer</label>
+                                            <input type="text" placeholder="Enter a new location, example; New York" id="location" autocomplete="off">
+                                        </div>
+                                    </section>
+                                    <section class="settings-box">
+                                        <div class="form-group">
+                                            <label id="interestsLabel" class="cleanText">Interests (0/10)</label>
+                                            <input type="text" autocomplete="off" id="interests" placeholder="Up to 10 interests, separated by commas" oninput="updateInterestsLabel(this)">
+                                        </div>
+                                    </section>
+                                    <section class="settings-box">
+                                        <div id="currentDesires" class="compact-section">
+                                            <label id="currentDesiresLabel" class="cleanText">Desires</label>
+                                        </div>
+                                        <div id="availableDesires" class="compact-section">
+                                            <div id="availableDesiresCategories"></div>
+                                        </div>
+                                    </section>
+                                    <section class="settings-box">
+                                        <div id="currentLookingForGrid" class="compact-section">
+                                            <label class="cleanText">Looking For</label>
+                                        </div>
+                                        <div id="availableLookingFor" class="compact-section">
+                                            <div id="availableLookingForCategories"></div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+
+                            <div class="save-button-container">
+                            </div>
+                        </section>
                     </div>
                 </section>
             </main>
@@ -216,10 +293,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     <script type="text/javascript" src="/vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/constants.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
     <script type="text/javascript" src="/js/likes.js"></script>
     <script type="text/javascript" src="/js/pings.js"></script>
     <script type="text/javascript" src="/js/swiping.js"></script>
+    <script type="text/javascript" src="/js/settings.js"></script>
 
     <script>
         const profile = <%- JSON.stringify(profileQueryResponse.data.account.profiles[0]) %>;
