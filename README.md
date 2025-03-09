@@ -34,3 +34,5 @@ node .
 ```
 
 ### 2) On your browser go to http://localhost:7331
+
+![img](https://i.imgur.com/PmalygF.png)
