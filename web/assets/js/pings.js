@@ -1,3 +1,6 @@
+var pingsNextPageCursor = null
+var isLoadingMorePings = false
+
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
     document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
@@ -7,11 +10,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var totalPingsEle = 0
 
-function loadPings(data) {
+function loadPings(data, firstLoad) {
+    isLoadingMorePings = false;
+
     var likedBy = data["data"]["interactions"]["nodes"];
     var userGrid = document.getElementById("pingsUserGrid");
-
-    notify("Feeld current loads your pings in batches so if you've got quite a few pings 20+ they may not all load, just like/dislike your current batch and refresh the page")
 
     var totalPings = document.getElementById("totalPings")
 
@@ -19,7 +22,15 @@ function loadPings(data) {
 
     totalPings.textContent = `${data["data"]["interactions"]["pageInfo"]["total"].toLocaleString()} Total Pings`;
 
-    userGrid.innerHTML = "";
+    if (data["data"]["interactions"]["pageInfo"]["hasNextPage"]) {
+        pingsNextPageCursor = data["data"]["interactions"]["pageInfo"]["nextPageCursor"]
+    } else {
+        pingsNextPageCursor = null
+    }
+
+    if (firstLoad) {
+         userGrid.innerHTML = "";
+    }
 
     likedBy.forEach(user => {
         var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id, lastSeen } = user;
@@ -252,4 +263,18 @@ async function rejectPing(profileId, displayName) {
             return false
         }
     }
+}
+
+async function loadMorePings() {
+    if (!pingsNextPageCursor) return;
+
+    var response = await backendRequest("/feeldRequest", {
+        operationName: "WhoPingsMe",
+        query: "query WhoPingsMe($limit: Int, $cursor: String, $sortBy: SortBy!) {\n  interactions: whoPingsMe(\n    input: {sortBy: $sortBy}\n    limit: $limit\n    cursor: $cursor\n  ) {\n    nodes {\n      ...LikesProfileFragment\n      __typename\n    }\n    pageInfo {\n      total\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment LikesProfileFragment on Profile {\n  id\n  age\n  gender\n  status\n  lastSeen\n  isUplift\n  sexuality\n  isMajestic\n  dateOfBirth\n  streamUserId\n  imaginaryName\n  allowPWM\n  verificationStatus\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  profilePairs {\n    identityId\n    __typename\n  }\n  distance {\n    km\n    mi\n    __typename\n  }\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  photos {\n    ...PhotoCarouselPictureFragment\n    __typename\n  }\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment PhotoCarouselPictureFragment on Picture {\n  id\n  pictureIsPrivate\n  pictureIsSafe\n  pictureStatus\n  pictureType\n  pictureUrl\n  publicId\n  verification {\n    status\n    __typename\n  }\n  __typename\n}",
+        variables: { sortBy: "LAST_INTERACTION", cursor: pingsNextPageCursor }
+    });
+
+    if (!response || !response.data || !response.data.interactions) return;
+
+    loadPings(response, false);
 }

@@ -67,6 +67,48 @@
         </div>
     </div>
 
+    <div id="moreUserInformationMatch" class="popup">
+        <div class="popup-content">
+             <section id="moreUserInformationMatchLastSeenSection" class="settings-group" style="display: none;">
+                <section class="settings-box">
+                    <label class="cleanText">Last Seen</label>
+                    <p class="cleanText" id="moreUserInformationMatchlastSeenText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Distance</label>
+                    <p class="cleanText" id="moreUserInformationMatchdistanceText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Desires</label>
+                    <p class="cleanText" id="moreUserInformationMatchdesiresText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Interests</label>
+                    <p class="cleanText" id="moreUserInformationMatchinterestsText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Bio</label>
+                    <br>
+                    <textarea class="swipeBioText" id="moreUserInformationMatchswipeBioText" rows="12" readonly></textarea>
+                </section>
+            </section>
+
+            <button class="btn-report" onclick="closeMoreUserInformationPopoutMatch()">Close</button>
+        </div>
+    </div>
+
     <div class="main-container">
         <header class="header">
             <div class="header-content">
@@ -96,6 +138,9 @@
                     </a>
                     <a href="#likes" class="nav-link">
                         <i class="fa-solid fa-thumbs-up"></i> Likes
+                    </a>
+                    <a href="#matches" class="nav-link">
+                        <i class="fa-solid fa-user-friends"></i> Matches
                     </a>
                     <a href="#chat" class="nav-link">
                         <i class="fa-solid fa-comments"></i> Chat
@@ -222,7 +267,6 @@
                     </div>
                 </section>
 
-
                 <section id="likes" class="content-section hidden">
                     <div id="likesContainer" class="tab-container">
                         <div class="tab">
@@ -240,6 +284,14 @@
                                 <label class="cleanText" id="totalPings">? Total Pings</label>
                             </div>
                             <div id="pingsUserGrid" class="likes-user-grid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="matches" class="content-section hidden">
+                    <div id="matchesContainer" class="tab-container">
+                        <div class="tab">
+                            <div id="matchesUserGrid" class="likes-user-grid"></div>
                         </div>
                     </div>
                 </section>
@@ -333,6 +385,7 @@
     <script type="text/javascript" src="/js/pings.js"></script>
     <script type="text/javascript" src="/js/swiping.js"></script>
     <script type="text/javascript" src="/js/settings.js"></script>
+    <script type="text/javascript" src="/js/matches.js"></script>
 
     <script>
         const profile = <%- JSON.stringify(profileQueryResponse.data.account.profiles[0]) %>;

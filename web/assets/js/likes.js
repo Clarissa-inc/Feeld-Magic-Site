@@ -1,15 +1,22 @@
 var totalLikesEle = 0
 var currentUserInMoreUserInformation = null
 
+var likesNextPageCursor = null
+var isLoadingMoreLikes = false
+
 function capitalizeFirstLetterWithSpaces(str) {
     return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 }
 
-function loadLikes(data) {
+function loadLikes(data, firstLoad) {
+    isLoadingMoreLikes = false;
+
     var likedBy = data["data"]["filteredWhoLikesMe"]["profiles"]["nodes"];
     var userGrid = document.getElementById("likesUserGrid");
 
-    notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
+    if (!profile.isMajestic && firstLoad) {
+        notify("Feeld current loads your likes in batches so if you've got quite a few likes 20+ they may not all load, just like/dislike your current batch and refresh the page")
+    }
 
     var totalLikes = document.getElementById("totalLikes")
 
@@ -17,7 +24,15 @@ function loadLikes(data) {
 
     totalLikes.textContent = `${data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["unfilteredTotal"].toLocaleString()} Total Likes`;
 
-    userGrid.innerHTML = "";
+    if (data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["hasNextPage"]) {
+        likesNextPageCursor = data["data"]["filteredWhoLikesMe"]["profiles"]["pageInfo"]["nextPageCursor"]
+    } else {
+        likesNextPageCursor = null
+    }
+
+    if (firstLoad) {
+        userGrid.innerHTML = "";
+    }
 
     likedBy.forEach(user => {
         var { age, gender, sexuality, imaginaryName, interactionStatus, photos, distance, id, lastSeen } = user;
@@ -298,4 +313,24 @@ async function dislikeUser(profileId, displayName) {
             return false
         }
     }
+}
+
+async function loadMoreLikes() {
+    if (!likesNextPageCursor) return;
+
+    var response = await backendRequest("/feeldRequest", {
+        "operationName": "FilteredWhoLikesMe",
+        "query": "mutation FilteredWhoLikesMe($input: FilteredInteractionInput!, $cursor: String) {\n  filteredWhoLikesMe(input: $input, cursor: $cursor) {\n    filters {\n      ageRange\n      desires\n      lookingFor\n      sexualities\n      __typename\n    }\n    profiles {\n      nodes {\n        ...LikesProfileFragment\n        __typename\n      }\n      pageInfo {\n        total\n        unfilteredTotal\n        hasNextPage\n        nextPageCursor\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment LikesProfileFragment on Profile {\n  id\n  age\n  gender\n  status\n  lastSeen\n  isUplift\n  sexuality\n  isMajestic\n  dateOfBirth\n  streamUserId\n  imaginaryName\n  allowPWM\n  verificationStatus\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  profilePairs {\n    identityId\n    __typename\n  }\n  distance {\n    km\n    mi\n    __typename\n  }\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  photos {\n    ...PhotoCarouselPictureFragment\n    __typename\n  }\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment PhotoCarouselPictureFragment on Picture {\n  id\n  pictureIsPrivate\n  pictureIsSafe\n  pictureStatus\n  pictureType\n  pictureUrl\n  publicId\n  verification {\n    status\n    __typename\n  }\n  __typename\n}",
+        "variables": {
+            "cursor": likesNextPageCursor,
+            "input": {
+                "filters": {},
+                "sortBy": "LAST_INTERACTION"
+            }
+        }
+    });
+
+    if (!response || !response.data || !response.data.filteredWhoLikesMe) return;
+
+    loadLikes(response, false);
 }

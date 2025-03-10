@@ -102,6 +102,7 @@ function closeReportPopout() {
 
 const sections = document.querySelectorAll(".content-section");
 const navLinks = document.querySelectorAll(".nav-link");
+var activeNav = null;
 
 navLinks.forEach((link) => {
     link.addEventListener("click", async function(e) {
@@ -109,10 +110,12 @@ navLinks.forEach((link) => {
 
         var target = link.getAttribute("href").substring(1);
 
-        if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings") {
-            notify("Not implemented yet (only dashboard, swipe, likes & pings, settings for now)")
+        if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings" && target !== "matches") {
+            notify("Not implemented yet (only dashboard, swipe, likes & pings, matches, settings for now)")
             return
         }
+
+        activeNav = target
 
         if (target == "swipe") {
             var response = await backendRequest("/feeldRequest", {
@@ -163,7 +166,7 @@ navLinks.forEach((link) => {
             if (response.errors) {
                 notify(response.errors[0].message)
             } else {
-                loadLikes(response)
+                loadLikes(response, true)
             }
         } else if (target == "pings") {
             var response = await backendRequest("/feeldRequest", {
@@ -180,7 +183,7 @@ navLinks.forEach((link) => {
             if (response.errors) {
                 notify(response.errors[0].message)
             } else {
-                loadPings(response)
+                loadPings(response, true)
             }
         } else if (target == "settings") {
             var response = await await backendRequest("/feeldRequest", {
@@ -212,6 +215,25 @@ navLinks.forEach((link) => {
                 setAccountInformation(response, searchSettingsResponse)
 
                 notify("Settings isn't finished yet sorry pookies")
+            }
+        } else if (target == "matches") {
+            var response = await backendRequest("/feeldRequest", {
+                "operationName": "ConnectionsModalQuery",
+                "query": "query ConnectionsModalQuery($cursor: String, $limit: Int) {\n  getProfileConnections(limit: $limit, cursor: $cursor) {\n    nodes {\n      ...ConnectionsListItemFragment\n      __typename\n    }\n    pageInfo {\n        total\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ConnectionsListItemFragment on ProfileConnection {\n  id\n  age\n  imaginaryName\n  avatar\n  gender\n  isIncognito\n  sexuality\n  status\n  verificationStatus\n  __typename\n}",
+                "variables": {
+                    "limit": 30
+                }
+            })
+
+            if (!response) {
+                notify("Failed to get matches")
+                return
+            }
+
+            if (response.errors) {
+                notify(response.errors[0].message)
+            } else {
+                loadMatches(response, true)
             }
         }
 
