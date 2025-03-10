@@ -30,9 +30,40 @@
 
     <div id="reportBugPopout" class="popup">
         <div class="popup-content">
+            <input class="redditUsernameText" type="text" maxlength="100" id="reportRedditUsername" placeholder="Reddit Username" autocomplete="off">
             <textarea id="bugDescription" maxlength="1500" placeholder="Describe the issue..."></textarea>
             <button class="btn-report" onclick="submitReport()">Report</button>
             <button class="btn-report" onclick="closeReportPopout()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="moreUserInformation" class="popup">
+        <div class="popup-content">
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Desires</label>
+                    <p class="cleanText" id="moreUserInformationdesiresText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Interests</label>
+                    <p class="cleanText" id="moreUserInformationinterestsText"></p>
+                </section>
+            </section>
+
+            <section class="settings-group">
+                <section class="settings-box">
+                    <label class="cleanText">Bio</label>
+                    <br>
+                    <textarea class="swipeBioText" id="moreUserInformationswipeBioText" rows="12" readonly></textarea>
+                </section>
+            </section>
+
+            <button class="btn-report" id="moreUserInformationLikeButton" onclick="likeUserFromMoreUserInformation()">Like User</button>
+            <button class="btn-report" id="moreUserInformationRejectButton" onclick="dislikeUserFromMoreUserInformation()">Reject User</button>
+            <button class="btn-report" onclick="closeMoreUserInformationPopout()">Close</button>
         </div>
     </div>
 
@@ -178,8 +209,10 @@
                                     <section class="settings-group">
                                         <section class="settings-box">
                                             <div class="spaced-button-container">
+                                                <button class="btn-swipe-user" onclick="swipeNextUser()">Next</button>
                                                 <button id="sipweLikeProfileButton" class="btn-swipe-user" onclick="swipeLikeUser()">Like</button>
                                                 <button id="swipeRejectProfileButton" class="btn-swipe-user" onclick="swipeRejectUser()">Reject</button>
+                                                <button class="btn-swipe-user" onclick="goBackUser()">Back</button>
                                             </div>
                                         </section>
                                     </section>

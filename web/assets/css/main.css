@@ -507,3 +507,12 @@ textarea {
     align-items: center;
     margin-bottom: 8px;
 }
+
+.redditUsernameText {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #42454a;
+    background-color: #3a3c42;
+    color: #fff;
+    font-size: 14px;
+}

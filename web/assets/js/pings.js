@@ -117,6 +117,18 @@ function loadPings(data) {
             plusButton.style.fontSize = "14px";
             plusButton.onclick = () => acceptPing(id, imaginaryName);
 
+            var viewMoreButton = document.createElement("button");
+            viewMoreButton.textContent = "View More";
+            viewMoreButton.setAttribute("alt", id);
+            viewMoreButton.style.padding = "8px 16px";
+            viewMoreButton.style.background = "#9370DB";
+            viewMoreButton.style.color = "#fff";
+            viewMoreButton.style.border = "none";
+            viewMoreButton.style.cursor = "pointer";
+            viewMoreButton.style.borderRadius = "5px";
+            viewMoreButton.style.fontSize = "14px";
+            viewMoreButton.onclick = () => viewMoreUser(user, id, imaginaryName, "pings");
+
             var minusButton = document.createElement("button");
             minusButton.textContent = "-";
             minusButton.setAttribute("alt", id);
@@ -130,6 +142,7 @@ function loadPings(data) {
             minusButton.onclick = () => rejectPing(id, imaginaryName);
 
             actionButtons.appendChild(plusButton);
+            actionButtons.appendChild(viewMoreButton);
             actionButtons.appendChild(minusButton);
 
             userSection.appendChild(actionButtons);
@@ -153,6 +166,30 @@ function removeFromPingCard(profileId) {
     }
 }
 
+async function likeUserFromMoreUserInformationPings() {
+    if (currentUserInMoreUserInformation !== null) {
+        var { id, imaginaryName } = currentUserInMoreUserInformation
+
+        var liked = await acceptPing(id, imaginaryName)
+
+        if (liked) {
+            closeMoreUserInformationPopout()
+        }
+    }
+}
+
+async function dislikeUserFromMoreUserInformationPings() {
+    if (currentUserInMoreUserInformation !== null) {
+        var { id, imaginaryName } = currentUserInMoreUserInformation
+
+        var disliked = await rejectPing(id, imaginaryName)
+
+        if (disliked) {
+            closeMoreUserInformationPopout()
+        }
+    }
+}
+
 async function acceptPing(profileId, displayName) {
     var response = await backendRequest("/feeldRequest", {
         "operationName": "ProfileLike",
@@ -164,7 +201,7 @@ async function acceptPing(profileId, displayName) {
 
     if (!response) {
         notify(`Failed to accept ping from ${displayName}`)
-        return
+        return false
     }
 
     if (response.data.profileLike) {
@@ -172,12 +209,15 @@ async function acceptPing(profileId, displayName) {
             notify(`Successfully matched with ${displayName}`)
 
             removeFromPingCard(profileId)
+            return true
         }
     } else {
         if (response.errors) {
             notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+            return false
         } else {
             notify(`Failed to like/match ${displayName} - Unknown reason`)
+            return false
         }
     }
 }
@@ -193,7 +233,7 @@ async function rejectPing(profileId, displayName) {
 
     if (!response) {
         notify(`Failed to reject ping from ${displayName}`)
-        return
+        return false
     }
 
     if (response.data.profileDislike) {
@@ -201,12 +241,15 @@ async function rejectPing(profileId, displayName) {
             notify(`Successfully rejected ping from ${displayName}`)
 
             removeFromPingCard(profileId)
+            return true
         }
     } else {
         if (response.errors) {
             notify(`Failed to reject ping from ${displayName} - ${response.errors[0].message}`)
+            return false
         } else {
             notify(`Failed to reject ping from ${displayName} - Unknown reason`)
+            return false
         }
     }
 }

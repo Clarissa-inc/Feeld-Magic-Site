@@ -1,4 +1,5 @@
 var totalLikesEle = 0
+var currentUserInMoreUserInformation = null
 
 function capitalizeFirstLetterWithSpaces(str) {
     return str.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
@@ -115,6 +116,18 @@ function loadLikes(data) {
             plusButton.style.fontSize = "14px";
             plusButton.onclick = () => matchUser(id, imaginaryName);
 
+            var viewMoreButton = document.createElement("button");
+            viewMoreButton.textContent = "View More";
+            viewMoreButton.setAttribute("alt", id);
+            viewMoreButton.style.padding = "8px 16px";
+            viewMoreButton.style.background = "#9370DB";
+            viewMoreButton.style.color = "#fff";
+            viewMoreButton.style.border = "none";
+            viewMoreButton.style.cursor = "pointer";
+            viewMoreButton.style.borderRadius = "5px";
+            viewMoreButton.style.fontSize = "14px";
+            viewMoreButton.onclick = () => viewMoreUser(user, id, imaginaryName, "likes");
+
             var minusButton = document.createElement("button");
             minusButton.textContent = "-";
             minusButton.setAttribute("alt", id);
@@ -128,6 +141,7 @@ function loadLikes(data) {
             minusButton.onclick = () => dislikeUser(id, imaginaryName);
 
             actionButtons.appendChild(plusButton);
+            actionButtons.appendChild(viewMoreButton);
             actionButtons.appendChild(minusButton);
 
             userSection.appendChild(actionButtons);
@@ -151,6 +165,77 @@ function removeFromLikesCard(profileId) {
     }
 }
 
+async function viewMoreUser(user, profileId, displayName, type) {
+    if (type == "likes") {
+        document.getElementById("moreUserInformationLikeButton").setAttribute("onclick", "likeUserFromMoreUserInformation()")
+        document.getElementById("moreUserInformationRejectButton").setAttribute("onclick", "dislikeUserFromMoreUserInformation()")
+
+        document.getElementById("moreUserInformationLikeButton").innerText = `Like ${displayName}`
+    } else if (type == "pings") {
+        document.getElementById("moreUserInformationLikeButton").innerText = `Match ${displayName}`
+
+        document.getElementById("moreUserInformationLikeButton").setAttribute("onclick", "likeUserFromMoreUserInformationPings()")
+        document.getElementById("moreUserInformationRejectButton").setAttribute("onclick", "dislikeUserFromMoreUserInformationPings()")
+    }
+
+    currentUserInMoreUserInformation = user;
+
+    var response = await backendRequest("/feeldRequest", {
+        "operationName": "ProfileQuery",
+        "query": "query ProfileQuery($profileId: String!) {\n  profile(id: $profileId) {\n    ...ProfileContentProfileFragment\n    streamUserId\n    __typename\n  }\n}\n\nfragment ProfileContentProfileFragment on Profile {\n  bio\n  age\n  streamUserId\n  dateOfBirth\n  distance {\n    km\n    mi\n    __typename\n  }\n  connectionGoals\n  desires\n  gender\n  id\n  status\n  imaginaryName\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  interests\n  isMajestic\n  isIncognito\n  lastSeen\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  sexuality\n  photos {\n    ...PhotoCarouselPictureFragment\n    __typename\n  }\n  pairCount\n  profilePairs {\n    ...ProfilePair\n    __typename\n  }\n  allowPWM\n  verificationStatus\n  enableChatContentModeration\n  ...AnalyticsProfileFragment\n  ...DiscoveryAnalyticsMetadata\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment PhotoCarouselPictureFragment on Picture {\n  id\n  pictureIsPrivate\n  pictureIsSafe\n  pictureStatus\n  pictureType\n  pictureUrl\n  publicId\n  verification {\n    status\n    __typename\n  }\n  __typename\n}\n\nfragment ProfilePair on ProfilePair {\n  identityId\n  createdAt\n  partnerLabel\n  otherProfile {\n    id\n    age\n    imaginaryName\n    dateOfBirth\n    gender\n    sexuality\n    isIncognito\n    photos {\n      ...GetPictureUrlFragment\n      __typename\n    }\n    ...ProfileInteractionStatusFragment\n    status\n    verificationStatus\n    __typename\n  }\n  __typename\n}\n\nfragment GetPictureUrlFragment on Picture {\n  id\n  publicId\n  pictureIsSafe\n  pictureIsPrivate\n  pictureUrl\n  __typename\n}\n\nfragment ProfileInteractionStatusFragment on Profile {\n  interactionStatus {\n    message\n    mine\n    theirs\n    __typename\n  }\n  __typename\n}\n\nfragment AnalyticsProfileFragment on Profile {\n  id\n  isUplift\n  lastSeen\n  age\n  gender\n  sexuality\n  verificationStatus\n  distance {\n    km\n    mi\n    __typename\n  }\n  profilePairs {\n    identityId\n    __typename\n  }\n  __typename\n}\n\nfragment DiscoveryAnalyticsMetadata on Profile {\n  metadata {\n    source\n    __typename\n  }\n  __typename\n}",
+        "variables": {
+            "profileId": profileId
+        }
+    })
+
+    if (!response) {
+        notify(`Failed to get full profile for ${displayName}`)
+        return
+    }
+
+    if (response.errros) {
+        notify(`Failed to get full profile for ${displayName} - ${response.errors[0].message}`)
+    } else {
+        var { bio, desires, interests } = response["data"]["profile"]
+
+        document.getElementById("moreUserInformationRejectButton").innerText = `Reject ${displayName}`
+
+        document.getElementById("moreUserInformationswipeBioText").value = bio || "N/A";
+        document.getElementById("moreUserInformationdesiresText").textContent = desires?.length ? desires.map(d => capitalizeFirstLetterWithSpaces(d.replaceAll("_", " "))).join(", ") : "N/A";
+        document.getElementById("moreUserInformationinterestsText").textContent = interests?.length ? interests.map(i => capitalizeFirstLetterWithSpaces(i.replaceAll("_", " "))).join(", ") : "N/A";
+
+        document.getElementById("moreUserInformation").style.display = "block"
+    }
+}
+
+function closeMoreUserInformationPopout() {
+    document.getElementById("moreUserInformation").style.display = "none"
+}
+
+async function likeUserFromMoreUserInformation() {
+    if (currentUserInMoreUserInformation !== null) {
+        var { id, imaginaryName } = currentUserInMoreUserInformation
+
+        var liked = await matchUser(id, imaginaryName)
+
+        if (liked) {
+            closeMoreUserInformationPopout()
+        }
+    }
+}
+
+async function dislikeUserFromMoreUserInformation() {
+    if (currentUserInMoreUserInformation !== null) {
+        var { id, imaginaryName } = currentUserInMoreUserInformation
+
+        var disliked = await dislikeUser(id, imaginaryName)
+
+        if (disliked) {
+            closeMoreUserInformationPopout()
+        }
+    }
+}
+
 async function matchUser(profileId, displayName) {
     var response = await backendRequest("/feeldRequest", {
         "operationName": "ProfileLike",
@@ -162,7 +247,7 @@ async function matchUser(profileId, displayName) {
 
     if (!response) {
         notify(`Failed to like/match ${displayName}`)
-        return
+        return false
     }
 
     if (response.data.profileLike) {
@@ -170,12 +255,15 @@ async function matchUser(profileId, displayName) {
             notify(`Successfully matched with ${displayName}`)
 
             removeFromLikesCard(profileId)
+            return true
         }
     } else {
         if (response.errors) {
             notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+            return false
         } else {
             notify(`Failed to like/match ${displayName} - Unknown reason`)
+            return false
         }
     }
 }
@@ -191,7 +279,7 @@ async function dislikeUser(profileId, displayName) {
 
     if (!response) {
         notify(`Failed to reject ${displayName}`)
-        return
+        return false
     }
 
     if (response.data.profileDislike) {
@@ -199,12 +287,15 @@ async function dislikeUser(profileId, displayName) {
             notify(`Successfully rejected ${displayName}`)
 
             removeFromLikesCard(profileId)
+            return true
         }
     } else {
         if (response.errors) {
             notify(`Failed to reject ${displayName} - ${response.errors[0].message}`)
+            return false
         } else {
             notify(`Failed to reject ${displayName} - Unknown reason`)
+            return false
         }
     }
 }

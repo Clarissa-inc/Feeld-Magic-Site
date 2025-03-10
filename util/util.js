@@ -172,10 +172,11 @@ module.exports = {
         }
     },
 
-    reportBug: async function(report) {
+    reportBug: async function(report, redditUsername) {
         try {
             var response = await axios.post(`https://${signingHost}/reportBug`, {
-                "report": report
+                "report": report,
+                "username": redditUsername
             }, {});
 
             if (response.status !== 200)
@@ -201,6 +202,24 @@ module.exports = {
             account["accessToken"] = newAccessToken
 
             fs.writeFileSync("./data/account.json", JSON.stringify(account, null, "\t"));
+        }
+    },
+
+    ensureUserIsntUsingPhone(request) {
+        try {
+            var userAgent = request.headers["user-agent"] || "";
+            var mobileRegex = /Android|iPhone|iPad|iPod|Windows Phone/i;
+
+            var safariRegex = /Safari/i;
+            var chromeRegex = /Chrome|Chromium|Edg/i;
+
+            var isMobile = mobileRegex.test(userAgent);
+            var isSafari = safariRegex.test(userAgent) && !chromeRegex.test(userAgent);
+
+            if (isMobile || isSafari)
+                return true
+        } catch (error) {
+            return false
         }
     }
 }

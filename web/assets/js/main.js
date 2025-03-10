@@ -26,7 +26,7 @@ function parseEmail(email) {
 
 async function backendRequest(endpoint, data) {
     try {
-        const response = await fetch(`http://localhost:7331${endpoint}`, {
+        const response = await fetch(`${endpoint}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -69,14 +69,29 @@ function handleReport() {
 }
 
 async function submitReport() {
+    var bugProblem = document.getElementById("bugDescription").value
+    var redditUsername = document.getElementById("reportRedditUsername").value
+
+    if (bugProblem.length < 3) {
+        notify("Please describe the problem")
+        return
+    }
+
+    if (redditUsername.length == 0) {
+        notify("Please enter your Reddit username")
+        return
+    }
+
     await backendRequest("/feeldRequest", {
         operationName: "ReportBug",
-        report: document.getElementById("bugDescription").value
+        report: bugProblem,
+        username: redditUsername
     })
 
     notify("Successfully reported bug")
 
     document.getElementById("bugDescription").value = ""
+    document.getElementById("reportRedditUsername").value = ""
 
     closeReportPopout()
 }

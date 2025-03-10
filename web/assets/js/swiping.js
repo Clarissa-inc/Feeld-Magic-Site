@@ -1,5 +1,7 @@
 var currentSwipeUsers = null;
 var currentSwipeUser = null;
+var swipeHistory = [];
+var removedUsers = new Set();
 
 function formatLastSeenTimestamp(timestamp) {
     var timestampDate = new Date(timestamp);
@@ -140,10 +142,14 @@ async function swipeLikeUser() {
 
     if (response.data.profileLike) {
         if (response.data.profileLike.status == "RECIPROCATED") {
+            removedUsers.add(currentSwipeUser.id);
+
             notify(`Successfully matched with ${currentSwipeUser.imaginaryName}`)
 
             handleSwipe()
         } else if (response.data.profileLike.status == "SENT") {
+            removedUsers.add(currentSwipeUser.id);
+
             notify(`Successfully liked ${currentSwipeUser.imaginaryName}`)
 
             handleSwipe()
@@ -175,6 +181,8 @@ async function swipeRejectUser() {
 
     if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
+            removedUsers.add(currentSwipeUser.id);
+
             notify(`Successfully rejected ${currentSwipeUser.imaginaryName}`)
 
             handleSwipe()
@@ -232,4 +240,38 @@ async function handleSwipe() {
             loadUserInSwipe()
         }
     }
+}
+
+function swipeNextUser() {
+    if (!currentSwipeUsers || !currentSwipeUsers.data?.discovery?.nodes?.length) {
+        notify("No more users to swipe");
+        return;
+    }
+
+    if (currentSwipeUser) {
+        swipeHistory.push(currentSwipeUser);
+    }
+
+    currentSwipeUsers.data.discovery.nodes.shift();
+
+    if (currentSwipeUsers.data.discovery.nodes.length > 0) {
+        loadUserInSwipe();
+    } else {
+        notify("No more users available");
+        currentSwipeUser = null;
+    }
+}
+
+function goBackUser() {
+    while (swipeHistory.length > 0) {
+        var previousUser = swipeHistory.pop();
+
+        if (!removedUsers.has(previousUser.id)) {
+            currentSwipeUsers.data.discovery.nodes.unshift(previousUser);
+            loadUserInSwipe();
+            return;
+        }
+    }
+
+    notify("No user to go back to");
 }

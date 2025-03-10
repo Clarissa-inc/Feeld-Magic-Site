@@ -21,7 +21,7 @@ app.post("/feeldRequest", async function(request, response) {
         }
 
         if (operationName === "ReportBug") {
-            await util.reportBug(request.body.report)
+            await util.reportBug(request.body.report, request.body.username)
             return response.status(200).end()
         }
 
@@ -30,7 +30,7 @@ app.post("/feeldRequest", async function(request, response) {
         if (operationName === "SignInLink")
             headers = util.generateFeeldHeaders(false, "null")
 
-        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe" || operationName == "DiscoverProfiles" || operationName == "AccountHome" || operationName == "DiscoverSearchSettingsQuery") {
+        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe" || operationName == "DiscoverProfiles" || operationName == "AccountHome" || operationName == "DiscoverSearchSettingsQuery" || operationName == "ProfileQuery") {
             await util.ensureAccessTokenIsValid()
 
             var account = JSON.parse(fs.readFileSync("./data/account.json"))
@@ -75,16 +75,22 @@ app.post("/firebaseRequest", async function(request, response) {
 
 app.get("/login", function(request, response) {
     try {
+        if (util.ensureUserIsntUsingPhone(request))
+            return response.render("error", { error: "I've blocked mobile devices from using this aswell as Safari as for some reason it refuses to work" } );
+        
         return response.render("login")
     } catch (error) {
         console.log("Error -", error)
 
-        return response.status(500).json({ error: "Error while trying to load" })
+        return response.render("error", { error: "Error while trying to load" } );
     }
 })
 
 app.get("/", async function(request, response) {
     try {
+        if (util.ensureUserIsntUsingPhone(request))
+            return response.render("error", { error: "I've blocked mobile devices from using this aswell as Safari as for some reason it refuses to work" } );
+
         var account = JSON.parse(fs.readFileSync("./data/account.json"))
 
         if (account["accessToken"] == null)
@@ -99,14 +105,14 @@ app.get("/", async function(request, response) {
 
             if (apiKey.length === 0) {
                 console.log("[-] You haven't set your apiKey, contact developer for a key")
-                return response.status(500).json({ error: "invalid apiKey, unable to login to account" })
+                return response.render("error", { error: "invalid apiKey, unable to login to account" } );
             }
 
             var signedData = await util.signRequest(apiKey)
 
             if (!signedData) {
                 console.log("[-] Failed to sign request, key is more than likely invalid")
-                return response.status(500).json({ error: "Failed to sign request, key is more than likely invalid" })
+                return response.render("error", { error: "Failed to sign request, key is more than likely invalid" } );
             }
 
             var feeldResponse = await util.feeldRequest(util.generateFeeldHeaders(account["accessToken"], "null"), {
@@ -122,12 +128,12 @@ app.get("/", async function(request, response) {
 
             if (!feeldResponse) {
                 console.log("[-] Failed to make login request to get profileId, your ip may have a bad score")
-                return response.status(500).json({ error: "Failed to make login request to get profileId, your ip may have a bad score" })
+                return response.render("error", { error: "Failed to make login request to get profileId, your ip may have a bad score" } );
             }
 
             if (!JSON.stringify(feeldResponse.data).includes("profile#")) {
                 console.log("[-] Failed to login, if you refresh the page and it fails again then contact developer")
-                return response.status(500).json({ error: feeldResponse.data.errors[0].message, moreHelp: "Contact developer" })
+                return response.render("error", { error: feeldResponse.data.errors[0].message } );
             } else {
                 account["profileId"] = feeldResponse.data.data.signin.profiles[0].id
 
@@ -143,24 +149,24 @@ app.get("/", async function(request, response) {
 
         if (!profileQueryResponse) {
             console.log("[-] Failed to get profile information, this should never happen")
-            return response.status(500).json({ error: "Failed to get profile information, this should never happen" })
+            return response.render("error", { error: "Failed to get profile information, this should never happen" } );
         }
 
         if (profileQueryResponse.data.errors)
-            return response.status(500).json({ error: profileQueryResponse.data.errors[0].message })
+            return response.render("error", { error: profileQueryResponse.data.errors[0].message } )
 
         var changelog = await util.getChangelog()
 
         if (!changelog) {
             console.log("[-] Failed to get changelog, backend may be down")
-            return response.status(500).json({ error: "Failed to get changelog, backend may be down" })
+            return response.render("error", { error: "Failed to get changelog, backend may be down" } );
         }
 
         return response.render("index", { "siteVersion": api.version, "feeldVersion": feeld.version, profileQueryResponse: profileQueryResponse.data, changelog })
     } catch (error) {
         console.log("Error -", error)
 
-        return response.status(500).json({ error: "Error while trying to load" })
+        return response.render("error", { error: "Error while trying to load" } );
     }
 })
 
