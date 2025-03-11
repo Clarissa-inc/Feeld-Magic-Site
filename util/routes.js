@@ -7,6 +7,24 @@ const fs = require("fs")
 // Variables
 var { api, feeld } = require("./config")
 
+app.post("/loadImage", async function(request, response) {
+    try {
+        var { imageUrl } = request.body;
+
+        if (!imageUrl)
+            return response.status(200).json({ success: false })
+
+        var imageData = await util.getImage(imageUrl)
+
+        if (!imageData)
+            return response.status(200).json({ success: false })
+
+        return response.status(200).json({ success: true, imageData: `data:image/png;base64,${imageData}` })
+    } catch (error) {
+        return response.status(500).json({ success: false })
+    }
+});
+
 app.post("/feeldRequest", async function(request, response) {
     try {
         var { operationName } = request.body;

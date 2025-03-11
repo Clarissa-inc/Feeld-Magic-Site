@@ -250,20 +250,16 @@ navLinks.forEach((link) => {
     });
 });
 
-function loadImage(img, imageUrl) {
-    fetch(imageUrl, { credentials: "omit", referrerPolicy: "no-referrer" })
-        .then(res => {
-            if (!res.ok)
-                return
-            
-            return res.blob();
-        })
-        .then(blob => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                img.src = reader.result;
-            };
-            reader.readAsDataURL(blob);
-        })
-        .catch(error => console.error("Error loading image:", error));
+async function loadImage(img, imageUrl) {
+    var response = await backendRequest("/loadImage", {
+        "imageUrl": imageUrl
+    })
+
+    if (!response)
+        return
+
+    if (!response.success)
+        return
+
+    img.src = response.imageData;
 }

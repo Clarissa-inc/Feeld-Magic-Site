@@ -205,7 +205,7 @@ module.exports = {
         }
     },
 
-    ensureUserIsntUsingPhone(request) {
+    ensureUserIsntUsingPhone: function(request) {
         try {
             var userAgent = request.headers["user-agent"] || "";
             var mobileRegex = /Android|iPhone|iPad|iPod|Windows Phone/i;
@@ -221,5 +221,27 @@ module.exports = {
         } catch (error) {
             return false
         }
+    },
+
+    getImage: async function(imageUrl) {
+        return new Promise((resolve, reject) => {
+            https.get(imageUrl, {
+                headers: {
+                    "user-agent": `Feeld/${feeld.version} (iPhone; iOS 18.3.1; Scale/3.00)`,
+                    "accept": "image/*,*/*;q=0.8",
+                    "accept-language": "en-GB,en;q=0.9",
+                    "accept-encoding": "gzip, deflate, br",
+                    Connection: "keep-alive"
+                }
+            }, (response) => {
+                if (response.statusCode !== 200) return resolve(false);
+
+                response.setEncoding("base64");
+                let base64 = "";
+
+                response.on("data", (chunk) => base64 += chunk);
+                response.on("end", () => resolve(base64));
+            }).on("error", reject);
+        });
     }
 }
