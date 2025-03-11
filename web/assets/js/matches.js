@@ -66,7 +66,7 @@ function loadMatches(data, firstLoad) {
         photoContainer.style.textAlign = "center";
 
         var img = document.createElement("img");
-        img.src = avatar
+        loadImage(img, avatar)
         img.classList.add("likes-user-photo");
         img.style.maxWidth = "100%";
         img.style.borderRadius = "10px";

@@ -66,7 +66,7 @@ function handlePhotos(photos) {
     photos.forEach((photoObj, index) => {
         if (photoObj.__typename == "Picture" && !photoObj.pictureIsPrivate) {
             var img = document.createElement("img");
-            img.src = photoObj.pictureUrl;
+            loadImage(img, photoObj.pictureUrl)
             img.alt = photoObj.publicId;
             img.id = photoObj.id;
             img.classList.add("photo");

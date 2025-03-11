@@ -70,7 +70,7 @@ function loadUserInSwipe() {
         slideshowContainer.style.textAlign = "center";
 
         var img = document.createElement("img");
-        img.src = photos[currentIndex].pictureUrl;
+        loadImage(img, photos[currentIndex].pictureUrl)
         img.classList.add("likes-user-photo");
         img.style.maxWidth = "100%";
         img.style.borderRadius = "10px";
@@ -105,14 +105,14 @@ function loadUserInSwipe() {
         backButton.addEventListener("click", () => {
             if (currentIndex > 0) {
                 currentIndex--;
-                img.src = photos[currentIndex].pictureUrl;
+                loadImage(img, photos[currentIndex].pictureUrl)
             }
         });
 
         nextButton.addEventListener("click", () => {
             if (currentIndex < photos.length - 1) {
                 currentIndex++;
-                img.src = photos[currentIndex].pictureUrl;
+                loadImage(img, photos[currentIndex].pictureUrl)
             }
         });
 

@@ -108,6 +108,10 @@ navLinks.forEach((link) => {
     link.addEventListener("click", async function(e) {
         e.preventDefault();
 
+        closeReportPopout()
+        closeMoreUserInformationPopoutMatch()
+        closeMoreUserInformationPopout()
+
         var target = link.getAttribute("href").substring(1);
 
         if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings" && target !== "matches") {
@@ -245,3 +249,21 @@ navLinks.forEach((link) => {
         link.classList.add("active");
     });
 });
+
+function loadImage(img, imageUrl) {
+    fetch(imageUrl, { credentials: "omit", referrerPolicy: "no-referrer" })
+        .then(res => {
+            if (!res.ok)
+                return
+            
+            return res.blob();
+        })
+        .then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error("Error loading image:", error));
+}

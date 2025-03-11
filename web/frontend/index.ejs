@@ -183,6 +183,16 @@
                                             <label>Changelog</label>
                                             <textarea id="changelog" rows="14" readonly><%= changelog.map(log => `${log}`).join("\n") %></textarea>
                                     </section>
+                                </div>
+
+                                <div class="settings-column">
+                                    <section class="settings-box">
+                                        <div class="form-group">
+                                            <label id="justaghostChatLabel">Chat</label>
+                                            <textarea id="chatMessages" rows="14" readonly></textarea>
+                                            <input type="text" placeholder="Enter a message..." maxlength="500" id="chatMessageInput" autocomplete="off">
+                                    </section>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -386,6 +396,7 @@
     <script type="text/javascript" src="/js/swiping.js"></script>
     <script type="text/javascript" src="/js/settings.js"></script>
     <script type="text/javascript" src="/js/matches.js"></script>
+    <script type="text/javascript" src="/js/justaghostChat.js"></script>
 
     <script>
         const profile = <%- JSON.stringify(profileQueryResponse.data.account.profiles[0]) %>;
