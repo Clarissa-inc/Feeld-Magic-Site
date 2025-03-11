@@ -4,11 +4,15 @@ var isLoadingMorePings = false
 document.addEventListener("DOMContentLoaded", function() {
     notify('Feeld is aware of this and is trying to block the site from working hence images not loading')
     notify("Message for Feeld employees - My telegram is; @feeldghost")
-    
+
     document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
     document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
 
     addBioChangeEvent()
+
+    var changeLogData = document.getElementById("changelog")
+
+    changeLogData.scrollTop = changeLogData.scrollHeight;
 });
 
 var totalPingsEle = 0

@@ -18,12 +18,14 @@ $(document).ready(function() {
                 notify("Please enter a valid email")
                 loginButton.prop("disabled", false)
             } else {
+                email = email.toLowerCase()
+
                 var response = await backendRequest("/feeldRequest", {
                     "operationName": "SignInLink",
                     "query": "mutation SignInLink($input: SendSignInLinkInput!) {\n  sendSignInLink(input: $input)\n}",
                     "variables": {
                         "input": {
-                            "email": email.toLowerCase(),
+                            "email": email,
                             "isSignUpFlow": false,
                             "language": "ENGLISH_BRITISH"
                         }
@@ -38,6 +40,7 @@ $(document).ready(function() {
 
                 if (response.data && response.data.sendSignInLink) {
                     notify(`Successfully sent verification email to ${email}`)
+                    notify("Go to your email then right click the 'Log in to Feeld' button and copy the link address / url and paste it here (do not click it as it'll destory the link)")
 
                     $("#verification-message").show();
                     $("#email").replaceWith('<input id="verificationEmail" type="text" placeholder="Login Link" required>');
@@ -53,13 +56,13 @@ $(document).ready(function() {
             const verificationEmail = $("#verificationEmail").val();
 
             if (!verificationEmail) {
-                notify("Please enter a valid login link")
+                notify("Invalid login link. Go to your email then right click the 'Log in to Feeld' button and copy the link address / url and paste it here (do not click it as it'll destory the link)")
                 loginButton.prop("disabled", false)
             } else {
                 var oobCode = parseEmail(decodeURIComponent(verificationEmail))
 
                 if (oobCode === null) {
-                    notify("Please enter a valid login link")
+                    notify("Invalid login link. Go to your email then right click the 'Log in to Feeld' button and copy the link address / url and paste it here (do not click it as it'll destory the link)")
                     loginButton.prop("disabled", false)
                 } else {
                     var fbResponse = await backendRequest("/firebaseRequest", {
