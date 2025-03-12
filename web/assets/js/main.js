@@ -218,7 +218,7 @@ navLinks.forEach((link) => {
             } else {
                 setAccountInformation(response, searchSettingsResponse)
 
-                notify("Settings isn't finished yet sorry pookies")
+                notify("More settings will be implemeneted in the future")
             }
         } else if (target == "matches") {
             var response = await backendRequest("/feeldRequest", {
@@ -262,4 +262,29 @@ async function loadImage(img, imageUrl) {
         return
 
     img.src = response.imageData;
+}
+
+async function findLocation(location) {
+    try {
+        var response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json`, {
+            method: "GET"
+        });
+
+        var data = await response.json();
+
+        if (!response.ok)
+            return false
+
+        if (JSON.stringify(data).includes(`"lat":`)) {
+            var randomLocation = data[Math.floor(Math.random() * data.length)];
+
+            return {
+                "longitude": parseFloat(parseFloat(randomLocation["lon"]).toFixed(3)),
+                "latitude": parseFloat(parseFloat(randomLocation["lat"]).toFixed(3))
+            }
+        } else
+            return false
+    } catch (error) {
+        return false;
+    }
 }

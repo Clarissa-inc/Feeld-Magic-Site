@@ -31,6 +31,12 @@ function connectToGhostWs() {
 
                 document.getElementById("devTime").value = parsedData.devTime
 
+                if (parsedData.spotify.song.length == 0) {
+                    document.getElementById("spotifyNowPlaying").value = "Nothing is currently playing"
+                } else {
+                    document.getElementById("spotifyNowPlaying").value = parsedData.spotify.song
+                }
+
                 if (parsedData.isGhostConnected)
                     document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online) (Ghost Is Online)`;
                 else
@@ -46,6 +52,12 @@ function connectToGhostWs() {
                     document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
             } else if (parsedData.type == "devTimeUpdate") {
                 document.getElementById("devTime").value = parsedData.devTime
+
+                if (parsedData.spotify.song.length == 0) {
+                    document.getElementById("spotifyNowPlaying").value = "Nothing is currently playing"
+                } else {
+                    document.getElementById("spotifyNowPlaying").value = parsedData.spotify.song
+                }
             }
         } catch (error) {
         }
@@ -53,6 +65,7 @@ function connectToGhostWs() {
 
     chatWebsocket.onclose = function () {
         document.getElementById("justaghostChatLabel").textContent = `Chat (Not Connected)`;
+        document.getElementById("spotifyNowPlaying").value = "Unknown"
 
         attemptReconnect();
     };

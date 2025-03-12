@@ -6,7 +6,6 @@ var currentInformation = {
     photoOrder: null,
     interests: null,
     desires: null,
-    location: "",
     lookingFor: null
 }
 
@@ -34,7 +33,7 @@ function setAccountInformation(data, searchSettingsData) {
 
         if (data["data"]["profile"]["interests"].length >= 1) {
             interestsElement.value = data["data"]["profile"]["interests"].join(", ")
-            interestsLabel.textContent = `Interests (${data["data"]["profile"]["interests"]}/10)`
+            interestsLabel.textContent = `Interests (${data["data"]["profile"]["interests"].length}/10)`
         }
     }
 
@@ -305,7 +304,7 @@ function setSexuality(currentSexuality) {
 
 function updateInterestsLabel(currentInterests) {
     var interestsArray = currentInterests.value.split(",").map(interest => interest.trim()).filter(interest => interest !== "")
-    
+
     if (interestsArray.length > 10) {
         notify("You cannot have more than 10 interests")
 
@@ -321,4 +320,155 @@ function arraysAreDifferent(arrayOne, arrayTwo) {
     if (arrayOne.length !== arrayTwo.length) return true;
 
     return arrayOne.some((value, index) => value !== arrayTwo[index]);
+}
+
+async function handleSettingsUpdate() {
+    var profileUpdateOptions = {}
+    var searchSettingsUpdate = {}
+
+    var currentPhotoOrder = Array.from(document.querySelectorAll("#photoGrid img.photo")).map(img => img.alt);
+    var currentDisplayName = document.getElementById("profileDisplayName").value
+    var currentLocation = document.getElementById("location").value
+    var currentGender = document.getElementById("gender-selector").value
+    var currentSexuality = document.getElementById("sexuality-selector").value
+    var currentBio = document.getElementById("profileBio").value
+    var currentInterests = document.getElementById("interests").value.split(",").map(interest => interest.trim()).filter(desire => desire !== null && desire !== "");
+    var currentDesires = Array.from(document.querySelectorAll(".compact-item.selected")).map(item => item.getAttribute("data-desire")).filter(desire => desire !== null);
+    var currentLookingFor = Array.from(document.querySelectorAll(".compact-item.selected")).map(item => item.getAttribute("data-lookingFor")).filter(lookingFor => lookingFor !== null);
+
+    if (currentLookingFor.length == 0) {
+        notify("You must select at least one 'lookingFor'")
+        return
+    }
+
+    if (currentBio != currentInformation["bio"]) {
+        profileUpdateOptions["bio"] = currentBio
+    }
+
+    if (currentGender != currentInformation["gender"]) {
+        profileUpdateOptions["gender"] = currentGender
+    }
+
+    if (currentSexuality != currentInformation["sexuality"]) {
+        profileUpdateOptions["sexuality"] = currentSexuality
+    }
+
+    if (currentDisplayName != currentInformation["profileDisplayName"]) {
+        profileUpdateOptions["imaginaryName"] = currentDisplayName
+    }
+
+    if (arraysAreDifferent(currentDesires, currentInformation["desires"])) {
+        profileUpdateOptions["desires"] = currentDesires
+    }
+
+    if (arraysAreDifferent(currentInterests, currentInformation["interests"])) {
+        profileUpdateOptions["interests"] = currentInterests
+    }
+
+    if (arraysAreDifferent(currentLookingFor, currentInformation["lookingFor"])) {
+        searchSettingsUpdate["lookingFor"] = currentLookingFor
+    }
+
+    if (JSON.stringify(profileUpdateOptions) != "{}") {
+        var response = await backendRequest("/feeldRequest", {
+            "operationName": "ProfileUpdate",
+            "query": "mutation ProfileUpdate($input: ProfileUpdateInput!) {\n  profileUpdate(input: $input) {\n    id\n    age\n    ageRange\n    allowPWM\n    bio\n    completionStatus\n    dateOfBirth\n    desires\n    distanceMax\n    gender\n    imaginaryName\n    interests\n    isIncognito\n    lookingFor\n    recentlyOnline\n    sexuality\n    status\n    streamToken\n    __typename\n  }\n}",
+            "variables": {
+                "input": profileUpdateOptions
+            }
+        })
+
+        if (!response) {
+            notify("Failed get response from profile update")
+            return
+        }
+
+        if (response.errors) {
+            notify(response.errors[0].message)
+        } else {
+            currentInformation["profileDisplayName"] = currentDisplayName
+            currentInformation["bio"] = currentBio
+            currentInformation["gender"] = currentGender
+            currentInformation["sexuality"] = currentSexuality
+            currentInformation["desires"] = currentDesires
+            currentInformation["interests"] = currentInterests
+
+            notify("Successfully updated profile information")
+        }
+    }
+
+    if (JSON.stringify(searchSettingsUpdate) != "{}") {
+        var response = await backendRequest("/feeldRequest", {
+            "operationName": "SearchSettingsUpdate",
+            "query": "mutation SearchSettingsUpdate($ageRange: [Int], $distanceMax: Float, $desiringFor: [Desire!], $lookingFor: [LookingFor!], $recentlyOnline: Boolean) {\n  profileUpdate(\n    input: {ageRange: $ageRange, distanceMax: $distanceMax, desiringFor: $desiringFor, lookingFor: $lookingFor, recentlyOnline: $recentlyOnline}\n  ) {\n    ...SearchSettingsProfileFragment\n    __typename\n  }\n}\n\nfragment SearchSettingsProfileFragment on Profile {\n  id\n  ageRange\n  distanceMax\n  desiringFor\n  lookingFor\n  location {\n    ...ProfileLocationFragment\n    __typename\n  }\n  recentlyOnline\n  __typename\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}",
+            "variables": searchSettingsUpdate
+        })
+
+        if (!response) {
+            notify("Failed get response from lookingFor update")
+            return
+        }
+
+        if (response.errors) {
+            notify(response.errors[0].message)
+        } else {
+            currentInformation["lookingFor"] = currentLookingFor
+            profile.lookingFor = currentLookingFor
+
+            notify("Successfully updated lookingFor")
+        }
+    }
+
+    if (arraysAreDifferent(currentPhotoOrder, currentInformation["photoOrder"])) {
+        var response = await backendRequest("/feeldRequest", {
+            "operationName": "PicturesReorder",
+            "query": "mutation PicturesReorder($input: PicturesReorderInput!) {\n  picturesReorder(input: $input) {\n    id\n    photos {\n      ...PicturesReorderFragment\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment PicturesReorderFragment on Picture {\n  id\n  publicId\n  pictureOrder\n  pictureType\n  __typename\n}",
+            "variables": {
+                "input": {
+                    "picturesPublicIds": currentPhotoOrder
+                }
+            }
+        })
+
+        if (!response) {
+            notify("Failed get response from photo order update")
+            return
+        }
+
+        if (response.errors) {
+            notify(response.errors[0].message)
+        } else {
+            currentInformation["photoOrder"] = currentPhotoOrder
+
+            notify("Successfully updated picture order")
+        }
+    }
+
+    if (currentLocation.length != 0) {
+        response = await findLocation(currentLocation)
+
+        if (!response) {
+            notify(`There was a problem looking up ${currentLocation}, make sure it's not too vague`);
+            return;
+        }
+
+        var feeeldResponse = await backendRequest("/feeldRequest", {
+            "operationName": "DeviceLocationUpdate",
+            "query": "mutation DeviceLocationUpdate($input: DeviceLocationInput!) {\n  deviceLocationUpdate(input: $input) {\n    id\n    location {\n      device {\n        latitude\n        longitude\n        geocode {\n          city\n          country\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    profiles {\n      id\n      location {\n        ...ProfileLocationFragment\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ProfileLocationFragment on ProfileLocation {\n  ... on DeviceLocation {\n    device {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  ... on VirtualLocation {\n    core\n    __typename\n  }\n  ... on TeleportLocation {\n    current: device {\n      city\n      country\n      __typename\n    }\n    teleport {\n      latitude\n      longitude\n      geocode {\n        city\n        country\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}",
+            "variables": {
+                "input": {
+                    "latitude": response.latitude,
+                    "longitude": response.longitude
+                }
+            }
+        });
+
+        if (response.errors) {
+            notify(response.errors[0].message)
+        } else {
+            document.getElementById("location").value = ""
+
+            notify(`Successfully updated location to '${currentLocation}'`)
+        }
+    }
 }

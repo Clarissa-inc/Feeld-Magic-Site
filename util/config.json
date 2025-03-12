@@ -1,6 +1,6 @@
 {
 	"api": {
-		"version": "1.0.11"
+		"version": "1.0.12"
 	},
 	"feeld": {
 		"sentryPublicKey": "9b7d845ff1ee4461a7129aecccd888d5",

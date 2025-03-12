@@ -188,6 +188,10 @@
                                 <div class="settings-column">
                                     <section class="settings-box">
                                         <div class="form-group">
+                                            <label>Ghost's Spotify Now Playing</label>
+                                            <input type="text" id="spotifyNowPlaying" readonly value="Unknown">
+                                        </div>
+                                        <div class="form-group">
                                             <label>Development Time (24h)</label>
                                             <input type="text" id="devTime" readonly value="Unknown">
                                         </div>
@@ -381,7 +385,9 @@
                                 </div>
                             </div>
 
+                            <br>
                             <div class="save-button-container">
+                                <button class="btn-report" onclick="handleSettingsUpdate()">Update Settings</button>
                             </div>
                         </section>
                     </div>
