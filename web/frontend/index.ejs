@@ -159,29 +159,8 @@
                                 <div class="settings-column">
                                     <section class="settings-box">
                                         <div class="form-group">
-                                            <label>Email</label>
-                                            <input type="text" readonly value="<%= profileQueryResponse.data.account.email %>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Display Name</label>
-                                            <input type="text" readonly value="<%= profileQueryResponse.data.account.profiles[0].imaginaryName %>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Gender</label>
-                                            <input type="text" readonly id="gender" value="<%= profileQueryResponse.data.account.profiles[0].gender %>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Sexuality</label>
-                                            <input type="text" id="sexuality" readonly value="<%= profileQueryResponse.data.account.profiles[0].sexuality %>">
-                                        </div>
-                                    </section>
-                                </div>
-
-                                <div class="settings-column">
-                                    <section class="settings-box">
-                                        <div class="form-group">
                                             <label>Changelog</label>
-                                            <textarea id="changelog" rows="14" readonly><%= changelog.map(log => `${log}`).join("\n") %></textarea>
+                                            <textarea id="changelog" rows="27" readonly><%= changelog.map(log => `${log}`).join("\n") %></textarea>
                                     </section>
                                 </div>
 
