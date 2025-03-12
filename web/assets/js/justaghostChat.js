@@ -29,12 +29,23 @@ function connectToGhostWs() {
             if (parsedData.type === "connectionAck") {
                 document.getElementById("chatMessages").value = ""
 
-                document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
+                document.getElementById("devTime").value = parsedData.devTime
+
+                if (parsedData.isGhostConnected)
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online) (Ghost Is Online)`;
+                else
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
+
                 parsedData.previousMessages.forEach(appendMessage);
             } else if (parsedData.type === "newMessage") {
                 appendMessage(parsedData);
             } else if (parsedData.type == "userDisconnected") {
-                document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
+                if (parsedData.isGhostConnected) {
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online) (Ghost Is Online)`;
+                } else
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
+            } else if (parsedData.type == "devTimeUpdate") {
+                document.getElementById("devTime").value = parsedData.devTime
             }
         } catch (error) {
         }
