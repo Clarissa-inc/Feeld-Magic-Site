@@ -177,7 +177,7 @@
                                         <div class="form-group">
                                             <label id="justaghostChatLabel">Chat</label>
                                             <textarea id="chatMessages" rows="14" readonly></textarea>
-                                            <input type="text" placeholder="Enter a message..." maxlength="500" id="chatMessageInput" autocomplete="off">
+                                            <input type="text" placeholder=""Enter a message..."" maxlength="500" id="chatMessageInput" autocomplete="off">
                                     </section>
                                 </div>
                             </div>
@@ -293,6 +293,22 @@
                     </div>
                 </section>
 
+                <section id="chat" class="content-section hidden">
+                    <div id="unspokenUserBar" class="unspoken-users-bar"></div>
+                        <div id="chatContainer" class="chat-container">
+                            <div id="chatContent" class="chat-content">
+                            <div id="userList" class="user-list"></div>
+                            <div id="chatBox" class="chat-box">
+                                <div class="messages"></div>
+                                <div class="chat-input">
+                                    <input type="text" id="chat-message" placeholder="Enter a message..." autocomplete="off">
+                                    <button onclick="handleMessageSend()" id="send-message-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="settings" class="content-section hidden">
                     <div id="settingsContainer" class="tab-container">
                         <section id="profileSection">
@@ -386,6 +402,7 @@
     <script type="text/javascript" src="/js/settings.js"></script>
     <script type="text/javascript" src="/js/matches.js"></script>
     <script type="text/javascript" src="/js/justaghostChat.js"></script>
+    <script type="text/javascript" src="/js/chat.js"></script>
 
     <script>
         const profile = <%- JSON.stringify(profileQueryResponse.data.account.profiles[0]) %>;

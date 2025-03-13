@@ -48,7 +48,7 @@ app.post("/feeldRequest", async function(request, response) {
         if (operationName === "SignInLink")
             headers = util.generateFeeldHeaders(false, "null")
 
-        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe" || operationName == "DiscoverProfiles" || operationName == "AccountHome" || operationName == "DiscoverSearchSettingsQuery" || operationName == "ProfileQuery" || operationName == "ConnectionsModalQuery" || operationName == "ProfileUpdate" || operationName == "SearchSettingsUpdate" || operationName == "DeviceLocationUpdate") {
+        if (operationName === "ProfileLike" || operationName == "ProfileDislike" || operationName == "FilteredWhoLikesMe" || operationName == "WhoPingsMe" || operationName == "DiscoverProfiles" || operationName == "AccountHome" || operationName == "DiscoverSearchSettingsQuery" || operationName == "ProfileQuery" || operationName == "ConnectionsModalQuery" || operationName == "ProfileUpdate" || operationName == "SearchSettingsUpdate" || operationName == "DeviceLocationUpdate" || operationName == "HeaderSummaries" || operationName == "ListSummaries" || operationName == "ChatActivate") {
             await util.ensureAccessTokenIsValid()
 
             var account = JSON.parse(fs.readFileSync("./data/account.json"))

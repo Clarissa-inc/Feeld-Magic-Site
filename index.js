@@ -19,12 +19,16 @@ var { api, feeld } = require("./util/config")
 
 app.use("", require("./util/routes"))
 
+app.all("*", function(request, response) { return response.render("error", { error: "That path doesn't seem to exist." }); });
+
 createServer(app).listen(7331, async () => {
     if (fs.readFileSync("./data/apiKey.txt").toString().trim().length === 0) {
         console.log("[-] apiKey hasn't been set, contact developer for a key")
 
         return process.exit(0)
     }
+
+    await util.initAxiosClient()
 
     var latestVersion = await util.getLatestVersion()
 

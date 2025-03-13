@@ -5,14 +5,13 @@ document.addEventListener("DOMContentLoaded", function() {
     notify('Feeld is aware of this and is trying to block the site from working hence images not loading')
     notify("Message for Feeld employees - My telegram is; @feeldghost")
 
-    document.getElementById("sexuality").value = capitalizeFirstLetterWithSpaces(document.getElementById("sexuality").value)
-    document.getElementById("gender").value = capitalizeFirstLetterWithSpaces(document.getElementById("gender").value)
-
     addBioChangeEvent()
 
     var changeLogData = document.getElementById("changelog")
 
     changeLogData.scrollTop = changeLogData.scrollHeight;
+
+    handleWebsocket()
 });
 
 var totalPingsEle = 0
@@ -222,7 +221,10 @@ async function acceptPing(profileId, displayName) {
         return false
     }
 
-    if (response.data.profileLike) {
+    if (response.errors) {
+        notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+        return false
+    } else if (response.data.profileLike) {
         if (response.data.profileLike.status == "RECIPROCATED") {
             notify(`Successfully matched with ${displayName}`)
 
@@ -230,13 +232,8 @@ async function acceptPing(profileId, displayName) {
             return true
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
-            return false
-        } else {
-            notify(`Failed to like/match ${displayName} - Unknown reason`)
-            return false
-        }
+        notify(`Failed to like/match ${displayName} - Unknown reason`)
+        return false
     }
 }
 
@@ -254,7 +251,10 @@ async function rejectPing(profileId, displayName) {
         return false
     }
 
-    if (response.data.profileDislike) {
+    if (response.errros) {
+        notify(`Failed to reject ping from ${displayName} - ${response.errors[0].message}`)
+        return false
+    } else if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
             notify(`Successfully rejected ping from ${displayName}`)
 
@@ -262,13 +262,8 @@ async function rejectPing(profileId, displayName) {
             return true
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to reject ping from ${displayName} - ${response.errors[0].message}`)
-            return false
-        } else {
-            notify(`Failed to reject ping from ${displayName} - Unknown reason`)
-            return false
-        }
+        notify(`Failed to reject ping from ${displayName} - Unknown reason`)
+        return false
     }
 }
 

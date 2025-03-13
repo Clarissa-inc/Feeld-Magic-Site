@@ -266,7 +266,10 @@ async function matchUser(profileId, displayName) {
         return false
     }
 
-    if (response.data.profileLike) {
+    if (response.errors) {
+        notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
+        return false
+    } else if (response.data.profileLike) {
         if (response.data.profileLike.status == "RECIPROCATED") {
             notify(`Successfully matched with ${displayName}`)
 
@@ -274,13 +277,8 @@ async function matchUser(profileId, displayName) {
             return true
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to like/match ${displayName} - ${response.errors[0].message}`)
-            return false
-        } else {
-            notify(`Failed to like/match ${displayName} - Unknown reason`)
-            return false
-        }
+        notify(`Failed to like/match ${displayName} - Unknown reason`)
+        return false
     }
 }
 
@@ -298,7 +296,10 @@ async function dislikeUser(profileId, displayName) {
         return false
     }
 
-    if (response.data.profileDislike) {
+    if (response.errors) {
+        notify(`Failed to reject ${displayName} - ${response.errors[0].message}`)
+        return false
+    } else if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
             notify(`Successfully rejected ${displayName}`)
 
@@ -306,13 +307,8 @@ async function dislikeUser(profileId, displayName) {
             return true
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to reject ${displayName} - ${response.errors[0].message}`)
-            return false
-        } else {
-            notify(`Failed to reject ${displayName} - Unknown reason`)
-            return false
-        }
+        notify(`Failed to reject ${displayName} - Unknown reason`)
+        return false
     }
 }
 

@@ -1,5 +1,7 @@
 // Libraries
+const { createHTTP2Adapter } = require("axios-http2-adapter")
 const { v4: randomUuid } = require("uuid")
+const http2 = require("http2-wrapper")
 const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 const axios = require("axios")
@@ -10,6 +12,7 @@ const fs = require("fs")
 const signingHost = Buffer.from("ZmVlbGQuanVzdGFnaG9zdC5iaXo=", "base64")
 const hexadecimalCharacters = "0123456789abcdef"
 var { feeld } = require("./config")
+var axiosClient = null
 
 // Firebase Headers
 var baseFirebaseHeaders = {
@@ -71,7 +74,7 @@ module.exports = {
 
     feeldRequest: async function(headers, jsonData) {
         try {
-            var response = await axios.post("https://core.api.fldcore.com/graphql", jsonData, {
+            var response = await axiosClient.post("https://core.api.fldcore.com/graphql", jsonData, {
                 headers: headers
             });
 
@@ -91,7 +94,7 @@ module.exports = {
             headers["x-firebase-gmpid"] = `1:594152761603:ios:${this.generateGmpid()}`
             headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeld.version} iPhone/18.3.1 hw/iPhone16_1`
 
-            var response = await axios.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/emailLinkSignin?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA", jsonData, {
+            var response = await axiosClient.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/emailLinkSignin?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA", jsonData, {
                 headers: baseFirebaseHeaders
             });
 
@@ -110,7 +113,7 @@ module.exports = {
             headers["x-firebase-gmpid"] = `1:594152761603:ios:${this.generateGmpid()}`
             headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeld.version} iPhone/18.3.1 hw/iPhone16_1`
 
-            var response = await axios.post(`https://securetoken.googleapis.com/v1/token?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA`, {
+            var response = await axiosClient.post(`https://securetoken.googleapis.com/v1/token?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA`, {
                 "grantType": "refresh_token",
                 "refreshToken": refreshToken
             }, {
@@ -131,7 +134,7 @@ module.exports = {
 
     signRequest: async function(apiKey) {
         try {
-            var response = await axios.post(`https://${signingHost}/ios/sign`, {}, {
+            var response = await axiosClient.post(`https://${signingHost}/ios/sign`, {}, {
                 headers: {
                     "X-WeDaBess": apiKey
                 }
@@ -148,7 +151,7 @@ module.exports = {
 
     getLatestVersion: async function(apiKey) {
         try {
-            var response = await axios.post(`https://${signingHost}/latestVersion`, {}, {});
+            var response = await axiosClient.post(`https://${signingHost}/latestVersion`, {}, {});
 
             if (response.status !== 200)
                 return false;
@@ -161,7 +164,7 @@ module.exports = {
 
     getChangelog: async function() {
         try {
-            var response = await axios.get(`https://${signingHost}/changelog`);
+            var response = await axiosClient.get(`https://${signingHost}/changelog`);
 
             if (response.status !== 200)
                 return false;
@@ -174,7 +177,7 @@ module.exports = {
 
     reportBug: async function(report, redditUsername) {
         try {
-            var response = await axios.post(`https://${signingHost}/reportBug`, {
+            var response = await axiosClient.post(`https://${signingHost}/reportBug`, {
                 "report": report,
                 "username": redditUsername
             }, {});
@@ -243,5 +246,21 @@ module.exports = {
                 response.on("end", () => resolve(base64));
             }).on("error", reject);
         });
+    },
+
+    initAxiosClient: async function() {
+        axiosClient = axios.create({
+            adapter: createHTTP2Adapter({
+                agent: new http2.Agent({
+                    maxSessions: 500,
+                    maxFreeSessions: 50,
+                    timeout: 10000,
+                    rejectUnauthorized: false
+                }),
+                force: true
+            })
+        });
+
+        return true
     }
 }

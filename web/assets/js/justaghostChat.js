@@ -58,6 +58,11 @@ function connectToGhostWs() {
                 } else {
                     document.getElementById("spotifyNowPlaying").value = parsedData.spotify.song
                 }
+            } else if (parsedData.type == "userConnected") {
+                if (parsedData.isGhostConnected)
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online) (Ghost Is Online)`;
+                else
+                    document.getElementById("justaghostChatLabel").textContent = `Chat (${parsedData.connectedUsers} Online)`;
             }
         } catch (error) {
         }

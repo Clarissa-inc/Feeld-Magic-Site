@@ -140,7 +140,9 @@ async function swipeLikeUser() {
         return
     }
 
-    if (response.data.profileLike) {
+    if (response.errors) {
+        notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
+    } else if (response.data.profileLike) {
         if (response.data.profileLike.status == "RECIPROCATED") {
             removedUsers.add(currentSwipeUser.id);
 
@@ -155,11 +157,7 @@ async function swipeLikeUser() {
             handleSwipe()
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
-        } else {
-            notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - Unknown reason`)
-        }
+        notify(`Failed to like/match ${currentSwipeUser.imaginaryName} - Unknown reason`)
     }
 }
 
@@ -179,7 +177,9 @@ async function swipeRejectUser() {
         return
     }
 
-    if (response.data.profileDislike) {
+    if (response.errors) {
+        notify(`Failed to reject ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
+    } else if (response.data.profileDislike) {
         if (response.data.profileDislike == "SENT") {
             removedUsers.add(currentSwipeUser.id);
 
@@ -188,11 +188,7 @@ async function swipeRejectUser() {
             handleSwipe()
         }
     } else {
-        if (response.errors) {
-            notify(`Failed to reject ${currentSwipeUser.imaginaryName} - ${response.errors[0].message}`)
-        } else {
-            notify(`Failed to reject ${currentSwipeUser.imaginaryName} - Unknown reason`)
-        }
+        notify(`Failed to reject ${currentSwipeUser.imaginaryName} - Unknown reason`)
     }
 }
 

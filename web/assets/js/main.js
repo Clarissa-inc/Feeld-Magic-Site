@@ -114,11 +114,6 @@ navLinks.forEach((link) => {
 
         var target = link.getAttribute("href").substring(1);
 
-        if (target !== "dashboard" && target !== "swipe" && target !== "likes" && target !== "pings" && target !== "settings" && target !== "matches") {
-            notify("Not implemented yet (only dashboard, swipe, likes & pings, matches, settings for now)")
-            return
-        }
-
         activeNav = target
 
         if (target == "swipe") {
@@ -238,6 +233,66 @@ navLinks.forEach((link) => {
                 notify(response.errors[0].message)
             } else {
                 loadMatches(response, true)
+            }
+        } else if (target == "chat") {
+            messagesHistory = {}
+
+            var unspokenUsersResponse = await backendRequest("/feeldRequest", {
+                "operationName": "HeaderSummaries",
+                "query": "query HeaderSummaries($limit: Int = 10, $cursor: String) {\n  summaries: getChatSummariesForChatHeader(limit: $limit, cursor: $cursor) {\n    nodes {\n      ...ChatSummary\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ChatSummary on ChatSummary {\n  ...ChatSummaryItem\n  __typename\n}\n\nfragment ChatSummaryItem on ChatSummary {\n  id\n  name\n  type\n  status\n  avatarSet\n  memberCount\n  latestMessage\n  streamChannelId\n  targetProfileId\n  enableChatContentModeration\n  __typename\n}",
+                "variables": {
+                    "limit": 10
+                }
+            })
+
+            if (JSON.stringify(unspokenUsersResponse).includes("PaginatedChatSummaries")) {
+                currentChatResponses["unspokenUsersResponse"] = unspokenUsersResponse
+            } else {
+                notify("Failed to get inactive chats")
+            }
+
+            var activeChats = await backendRequest("/feeldRequest", {
+                "operationName": "ListSummaries",
+                "query": "query ListSummaries($limit: Int = 10, $cursor: String) {\n  summaries: getChatSummariesForChatList(limit: $limit, cursor: $cursor) {\n    nodes {\n      ...ChatSummary\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ChatSummary on ChatSummary {\n  ...ChatSummaryItem\n  __typename\n}\n\nfragment ChatSummaryItem on ChatSummary {\n  id\n  name\n  type\n  status\n  avatarSet\n  memberCount\n  latestMessage\n  streamChannelId\n  targetProfileId\n  enableChatContentModeration\n  __typename\n}",
+                "variables": {
+                    "limit": 10
+                }
+            })
+
+            if (JSON.stringify(activeChats).includes("PaginatedChatSummaries")) {
+                currentChatResponses["activeChats"] = activeChats
+
+                var messageIds = []
+
+                for (var i = 0; i < activeChats["data"]["summaries"]["nodes"].length; i++) {
+                    if (activeChats["data"]["summaries"]["nodes"][i]["latestMessage"]) {
+                        if (activeChats["data"]["summaries"]["nodes"][i]["latestMessage"]["cid"]) {
+                            messageIds.push(activeChats["data"]["summaries"]["nodes"][i]["latestMessage"]["cid"])
+                        }
+                    }
+                }
+
+                var chatStreamResponse = await chatStreamRequest({
+                    "filter_conditions": {
+                        "cid": {
+                            "$in": messageIds
+                        }
+                    },
+                    "limit": messageIds.length,
+                    "presence": true,
+                    "sort": [{
+                        "direction": -1,
+                        "field": "last_message_at"
+                    }],
+                    "state": true,
+                    "watch": true
+                })
+
+                currentChatResponses["chatStreamResponse"] = chatStreamResponse
+
+                loadChatPage(currentChatResponses["unspokenUsersResponse"], currentChatResponses["activeChats"], currentChatResponses["chatStreamResponse"])
+            } else {
+                notify("Failed to get recent chats")
             }
         }
 
