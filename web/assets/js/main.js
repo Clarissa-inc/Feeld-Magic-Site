@@ -258,7 +258,7 @@ navLinks.forEach((link) => {
                     "limit": 10
                 }
             })
-
+            
             if (JSON.stringify(activeChats).includes("PaginatedChatSummaries")) {
                 currentChatResponses["activeChats"] = activeChats
 

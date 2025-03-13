@@ -95,7 +95,7 @@ module.exports = {
             headers["user-agent"] = `FirebaseAuth.iOS/11.5.0 com.3nder.threender/${feeld.version} iPhone/18.3.1 hw/iPhone16_1`
 
             var response = await axiosClient.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/emailLinkSignin?key=AIzaSyD9o9mzulN50-hqOwF6ww9pxUNUxwVOCXA", jsonData, {
-                headers: baseFirebaseHeaders
+                headers: headers
             });
 
             return { statusCode: response.status, data: response.data }
