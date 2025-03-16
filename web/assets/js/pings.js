@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     changeLogData.scrollTop = changeLogData.scrollHeight;
 
-    handleWebsocket()
+    handleWebsocket(true)
 });
 
 var totalPingsEle = 0

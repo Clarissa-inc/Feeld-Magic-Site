@@ -91,8 +91,10 @@ function attemptReconnect() {
 
 function appendMessage(message) {
     const chatMessages = document.getElementById("chatMessages");
-    const timestamp = new Date(message.timestamp).toLocaleString();
-    const messageLine = `[${message.username}] [${timestamp}]: ${message.message}\n`;
+    const timestamp = new Date(message.timestamp)
+    const formattedTimestamp = `${timestamp.getDate().toString().padStart(2, "0")}/${(timestamp.getMonth() + 1).toString().padStart(2, "0")} ${timestamp.getHours().toString().padStart(2, "0")}:${timestamp.getMinutes().toString().padStart(2, "0")}`;
+
+    const messageLine = `[${message.username}] [${formattedTimestamp}]: ${message.message}\n`;
 
     chatMessages.value += messageLine;
     chatMessages.scrollTop = chatMessages.scrollHeight;

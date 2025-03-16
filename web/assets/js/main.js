@@ -253,9 +253,9 @@ navLinks.forEach((link) => {
 
             var activeChats = await backendRequest("/feeldRequest", {
                 "operationName": "ListSummaries",
-                "query": "query ListSummaries($limit: Int = 10, $cursor: String) {\n  summaries: getChatSummariesForChatList(limit: $limit, cursor: $cursor) {\n    nodes {\n      ...ChatSummary\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ChatSummary on ChatSummary {\n  ...ChatSummaryItem\n  __typename\n}\n\nfragment ChatSummaryItem on ChatSummary {\n  id\n  name\n  type\n  status\n  avatarSet\n  memberCount\n  latestMessage\n  streamChannelId\n  targetProfileId\n  enableChatContentModeration\n  __typename\n}",
+                "query": "query ListSummaries($limit: Int = 30, $cursor: String) {\n  summaries: getChatSummariesForChatList(limit: $limit, cursor: $cursor) {\n    nodes {\n      ...ChatSummary\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      nextPageCursor\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment ChatSummary on ChatSummary {\n  ...ChatSummaryItem\n  __typename\n}\n\nfragment ChatSummaryItem on ChatSummary {\n  id\n  name\n  type\n  status\n  avatarSet\n  memberCount\n  latestMessage\n  streamChannelId\n  targetProfileId\n  enableChatContentModeration\n  __typename\n}",
                 "variables": {
-                    "limit": 10
+                    "limit": 30
                 }
             })
             
@@ -287,6 +287,21 @@ navLinks.forEach((link) => {
                     "state": true,
                     "watch": true
                 })
+
+                var totalUsersOnlineRightNow = 0
+
+                chatStreamResponse.channels.forEach(channel => {
+                    var otherMember = channel.members.filter(member => member.user_id !== profile.streamUserId)
+
+                    if (otherMember.length == 1) {
+                        otherMember = otherMember[0]
+
+                        if (otherMember.user && otherMember.user.online)
+                            totalUsersOnlineRightNow += 1
+                    }
+                })
+
+                notify(`${totalUsersOnlineRightNow}/${messageIds.length} most recent users online right now`)
 
                 currentChatResponses["chatStreamResponse"] = chatStreamResponse
 

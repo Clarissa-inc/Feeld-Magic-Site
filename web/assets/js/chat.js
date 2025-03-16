@@ -628,7 +628,7 @@ function refreshActiveMessages(streamChannelId, displayName, messageText) {
     }
 }
 
-function handleWebsocket() {
+function handleWebsocket(firstLoad) {
     if (connectedToWebSocket)
         return
 
@@ -646,6 +646,12 @@ function handleWebsocket() {
     socket.addEventListener("message", (event) => {
         try {
             var data = JSON.parse(event.data);
+
+            if (data.me) {
+                if (firstLoad) {
+                    notify(`You have ${data.me.total_unread_count.toLocaleString()} chat notifications`)
+                }
+            }
 
             if (event.data.includes("was deactivated"))
                 isAccountDeactivated = true;
@@ -704,7 +710,7 @@ function handleWebsocket() {
                 }
             }
 
-            // console.log(data)
+            //console.log(data)
         } catch (error) {
             console.error("Error parsing Websocket message: ", error);
         }
@@ -725,7 +731,7 @@ function handleWebsocket() {
             socket.close()
         }
 
-        setTimeout(() => { handleWebsocket() }, 1000 * 2)
+        setTimeout(() => { handleWebsocket(false) }, 1000 * 2)
     });
 
     socket.addEventListener("error", (error) => {
@@ -734,7 +740,7 @@ function handleWebsocket() {
         if (socket.readyState !== WebSocket.CLOSED) {
             socket.close()
 
-            setTimeout(() => { handleWebsocket() }, 1000 * 2)
+            setTimeout(() => { handleWebsocket(false) }, 1000 * 2)
         }
     });
 }
@@ -777,7 +783,7 @@ async function chatStreamRequest(jsonData) {
                 "x-stream-client": "stream-chat-react-native-ios-5.32.1",
                 "accept-language": "en-GB,en;q=0.9",
                 "accept-encoding": "gzip, deflate, br",
-                "user-agent": "Feeld/1429 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+                "user-agent": "Feeld/1481 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
                 "x-client-request-id": randomUuid()
             },
             body: JSON.stringify(jsonData),
@@ -804,7 +810,7 @@ async function chatStreamRequestMessage(chatStreamId, jsonData) {
                 "x-stream-client": "stream-chat-react-native-ios-5.32.1",
                 "accept-language": "en-GB,en;q=0.9",
                 "accept-encoding": "gzip, deflate, br",
-                "user-agent": "Feeld/1429 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+                "user-agent": "Feeld/1481 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
                 "x-client-request-id": randomUuid()
             },
             body: JSON.stringify(jsonData),
@@ -831,7 +837,7 @@ async function chatStreamRequestEvent(chatStreamId, event) {
                 "x-stream-client": "stream-chat-react-native-ios-5.32.1",
                 "accept-language": "en-GB,en;q=0.9",
                 "accept-encoding": "gzip, deflate, br",
-                "user-agent": "Feeld/1429 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+                "user-agent": "Feeld/1481 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
                 "x-client-request-id": randomUuid()
             },
             body: JSON.stringify({
@@ -862,7 +868,7 @@ async function chatStreamRequestReadMessages(chatStreamId) {
                 "x-stream-client": "stream-chat-react-native-ios-5.32.1",
                 "accept-language": "en-GB,en;q=0.9",
                 "accept-encoding": "gzip, deflate, br",
-                "user-agent": "Feeld/1429 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
+                "user-agent": "Feeld/1481 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
                 "x-client-request-id": randomUuid()
             },
             body: JSON.stringify({}),
