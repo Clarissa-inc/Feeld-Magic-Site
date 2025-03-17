@@ -1,5 +1,8 @@
 # Feeld Magic Site
 
+# This will no longer work, use the hosted version of the site
+- `Reason` **Don't feel comfortable with people having access to the signer**
+
 ## Information/Important
 - **For mac users don't use Safari as it causes problems and it won't work**
 - This will only work if registered via **email** - it doesn't support the third party logins like `Apple`, `Facebook` & `Google` (You should be able to add a normal email by opening the app, going to the accounts tab > `App settings` > `Email`)
